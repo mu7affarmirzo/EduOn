@@ -1,4 +1,4 @@
 import os
 
 # Set the number of gunicorn workers
-workers = int(os.environ.get('GUNICORN_WORKERS', '5'))
+workers = int(os.environ.get('GUNICORN_WORKERS', '1'))
