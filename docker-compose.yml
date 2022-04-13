@@ -10,6 +10,17 @@ services:
   redis:
     image: library/redis:5.0-alpine
 
+  nginx:
+    build:
+      context: ./docker/nginx
+    image: ${DOCKER_REPOSITORY}/nginx:${DOCKER_NGINX_VERSION}
+    command: /run_nginx.sh
+    env_file:
+      - .env
+    ports:
+      - 80:80
+      - 443:443
+
   app:
     build:
       context: .

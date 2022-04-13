@@ -17,9 +17,14 @@ services:
     volumes:
       - eduon_redis:/data
 
+  nginx:
+    volumes:
+      - ./docker/nginx/letsencrypt/fullchain.pem:/etc/letsencrypt/live/${PRODUCTION_HOST}/fullchain.pem
+      - ./docker/nginx/letsencrypt/privkey.pem:/etc/letsencrypt/live/${PRODUCTION_HOST}/privkey.pem
+      - ./media:/app/media:ro
+      - ./static:/app/static:ro
+
   app:
-    ports:
-      - 8000:8000
     volumes:
       - .:/app
       - ./media:/app/media

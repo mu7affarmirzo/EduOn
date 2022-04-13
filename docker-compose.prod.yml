@@ -11,6 +11,13 @@ services:
     volumes:
       - /var/lib/redis/data:/data
 
+  nginx:
+    restart: unless-stopped
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - app-media:/app/media
+      - app-static:/app/static
+
   app:
     restart: unless-stopped
     volumes:
