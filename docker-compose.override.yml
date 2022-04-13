@@ -31,6 +31,18 @@ services:
       - ./static:/app/static
     command: python ./manage.py runserver 0.0.0.0:8000
 
+  celery-worker:
+    volumes:
+      - .:/app
+      - ./media:/app/media
+      - ./static:/app/static
+
+  celery-beat:
+    volumes:
+      - .:/app
+      - ./media:/app/media
+      - ./static:/app/static
+
 volumes:
   eduon_db:
   eduon_redis:

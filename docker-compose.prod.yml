@@ -24,6 +24,18 @@ services:
       - app-media:/app/media
       - app-static:/app/static
 
+  celery-worker:
+    restart: unless-stopped
+    volumes:
+      - app-media:/app/media
+      - app-static:/app/static
+
+  celery-beat:
+    restart: unless-stopped
+    volumes:
+      - app-media:/app/media
+      - app-static:/app/static
+
 volumes:
   app-media:
   app-static:
