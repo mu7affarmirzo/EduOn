@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  db:
+    environment:
+      - POSTGRES_USER=eduon
+      - POSTGRES_DB=eduon
+      - POSTGRES_PASSWORD=eduon
+    volumes:
+      - eduon_db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - 6379:6379
+    volumes:
+      - eduon_redis:/data
+
+  app:
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+      - ./media:/app/media
+      - ./static:/app/static
+    command: python ./manage.py runserver 0.0.0.0:8000
+
+volumes:
+  eduon_db:
+  eduon_redis:

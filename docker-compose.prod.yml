@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  db:
+    restart: unless-stopped
+    volumes:
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
+
+  redis:
+    restart: unless-stopped
+    volumes:
+      - /var/lib/redis/data:/data
+
+  app:
+    restart: unless-stopped
+    volumes:
+      - app-media:/app/media
+      - app-static:/app/static
+
+volumes:
+  app-media:
+  app-static:

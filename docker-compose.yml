@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:12.3
+    hostname: db
+    env_file:
+      - .env
+
+  redis:
+    image: library/redis:5.0-alpine
+
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    image: ${DOCKER_REPOSITORY}/app:${DOCKER_APP_VERSION}
+    hostname: app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
