@@ -36,4 +36,5 @@ SECRET_KEY={{your secret key}}
 ALLOWED_HOSTS={{your allowed host list(e.g.: localhost,127.0.0.1}}
 MEDIA_URL=/media/
 DATABASE_URL={{your db url}}
+GUNICORN_WORKERS=1
 ```
