@@ -37,7 +37,7 @@ services:
     image: ${DOCKER_REPOSITORY}/app:${DOCKER_APP_VERSION}
     env_file:
       - .env
-    command: /bin/bash -c "celery -A pharmacy_cloud worker --app=pharmacy_cloud.celeryconf:app --loglevel ${CELERY_WORKER_LOGLEVEL} -P threads"
+    command: /bin/bash -c "celery -A eduon_v1 worker --app=eduon_v1.celeryconf:app --loglevel ${CELERY_WORKER_LOGLEVEL} -P threads"
     depends_on:
       - app
 
@@ -45,7 +45,7 @@ services:
     image: ${DOCKER_REPOSITORY}/app:${DOCKER_APP_VERSION}
     env_file:
       - .env
-    command: /bin/bash -c "celery -A pharmacy_cloud beat --app=pharmacy_cloud.celeryconf:app --pidfile= --loglevel ${CELERY_BEAT_LOGLEVEL}"
+    command: /bin/bash -c "celery -A eduon_v1 beat --app=eduon_v1.celeryconf:app --pidfile= --loglevel ${CELERY_BEAT_LOGLEVEL}"
     depends_on:
       - app
 
