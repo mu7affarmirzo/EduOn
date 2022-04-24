@@ -2,6 +2,7 @@ from django.contrib import admin
 from accounts.models.account import Account
 from accounts.models.card import CreditCardModel
 from accounts.models.country import *
+from accounts.models.code import *
 
 
 class CountryAdmin(admin.ModelAdmin):
@@ -19,3 +20,4 @@ admin.site.register(CountryModel, CountryAdmin)
 admin.site.register(ProvinceModel, CountryAdmin)
 admin.site.register(DistrictModel, CountryAdmin)
 
+admin.site.register(CodeModel)

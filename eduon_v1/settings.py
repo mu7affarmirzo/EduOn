@@ -27,8 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = config('django-insecure-+yg7h2@t85c7^u3b6i86!e$$seup&s@how#)r!yeabk18ol2*w'
 SECRET_KEY = config('SECRET_KEY')
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+ACCOUNT_ID = "AC17e9804f68654358366bc478c40163c2"
+AUTH_TOKEN = "ee1f8e7d349bdfb82833803a11a72c14"
 
 ALLOWED_HOSTS = get_list(os.environ.get("ALLOWED_HOSTS", "eduon.uz,localhost,127.0.0.1,0.0.0.0"))
 
@@ -144,4 +145,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+# USE_X_FORWARDED_HOST = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

@@ -20,16 +20,17 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="API Docs",
-      default_version='v1',
-      description="EduOn",
-      terms_of_service="",
-      contact=openapi.Contact(email="eduon@gmail.com"),
-      license=openapi.License(name="BSD License"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    openapi.Info(
+        title="API Docs",
+        default_version='v1',
+        url='https://localhost',
+        description="EduOn",
+        terms_of_service="",
+        contact=openapi.Contact(email="eduon@gmail.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+        public=True,
+        permission_classes=(permissions.AllowAny,),
 )
 
 

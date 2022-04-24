@@ -38,8 +38,8 @@ class MyAccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser):
-    email = models.EmailField(verbose_name="email", max_length=60, unique=True)
-    phone_number = models.CharField(max_length=20, unique=True)
+    email = models.EmailField(verbose_name="email", max_length=60, unique=True, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
     f_name = models.CharField(max_length=50, blank=True, null=True)
     l_name = models.CharField(max_length=50, blank=True, null=True)
     sex = models.CharField(max_length=50, blank=True, null=True)
@@ -60,7 +60,7 @@ class Account(AbstractBaseUser):
     objects = MyAccountManager()
 
     def __str__(self):
-        return self.email
+        return str(self.email)
 
     def has_perm(self, perm, obj=None):
         return self.is_admin
