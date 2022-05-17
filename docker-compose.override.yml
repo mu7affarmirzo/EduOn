@@ -31,6 +31,13 @@ services:
       - ./static:/app/static
     command: python ./manage.py runserver 0.0.0.0:8000
 
+  stream:
+    volumes:
+      - ./streaming:/app
+      - ./streaming/media:/app/media
+      - ./streaming/static:/app/static
+    command: uvicorn main:app --host 0.0.0.0 --port 8080 --workers ${UVICORN_WORKERS} --log-level 'info' --limit-max-requests 1000
+
   celery-worker:
     volumes:
       - .:/app
