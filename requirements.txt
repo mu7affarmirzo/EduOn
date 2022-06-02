@@ -26,9 +26,10 @@ kombu==5.1.0
 MarkupSafe==2.0.1
 packaging==21.3
 passlib==1.7.4
+Pillow
 prompt-toolkit==3.0.29
 psycopg2==2.9.3
-PyJWT==2.3.0
+PyJWT==1.7.1
 pyparsing==3.0.8
 python-decouple==3.6
 pytz==2022.1
@@ -38,7 +39,6 @@ ruamel.yaml==0.17.21
 ruamel.yaml.clib==0.2.6
 six==1.16.0
 sqlparse==0.4.2
-twilio==7.8.1
 typing-extensions==4.1.1
 tzdata==2022.1
 uritemplate==4.1.1
