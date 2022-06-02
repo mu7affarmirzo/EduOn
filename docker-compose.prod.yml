@@ -24,6 +24,12 @@ services:
       - app-media:/app/media
       - app-static:/app/static
 
+  stream:
+    restart: unless-stopped
+    volumes:
+      - stream-media:/app/media
+      - stream-static:/app/static
+
   celery-worker:
     restart: unless-stopped
     volumes:
@@ -39,3 +45,5 @@ services:
 volumes:
   app-media:
   app-static:
+  stream-media:
+  stream-static:

@@ -1,0 +1,5 @@
+fastapi
+get-video-properties
+python-multipart
+Jinja2
+uvicorn

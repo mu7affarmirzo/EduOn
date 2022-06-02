@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Video</title>
+<body>
+<form
+        enctype="multipart/form-data"
+        method="POST"
+        name="uploadform"
+>
+    <input type="file" name="video"/>
+    <input type="submit"/>
+</form>
+<script type="text/javascript">
+    window.onload = function () {
+        document.uploadform.action = get_action();
+    }
+
+    function get_action() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const media_id = urlParams.get('media_id');
+        return "http://localhost:8080/media/" + media_id + "/upload";
+    }
+</script>
+</body>
+</html>

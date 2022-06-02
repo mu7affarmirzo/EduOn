@@ -20,3 +20,4 @@ admin.site.register(CountryModel, CountryAdmin)
 admin.site.register(ProvinceModel, CountryAdmin)
 admin.site.register(DistrictModel, CountryAdmin)
 
+admin.site.register(CodeModel)

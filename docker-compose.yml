@@ -33,6 +33,17 @@ services:
       - db
       - redis
 
+  stream:
+    build:
+      context: .
+      dockerfile: ./docker/stream/Dockerfile
+    image: ${DOCKER_REPOSITORY}/stream:${DOCKER_APP_VERSION}
+    hostname: stream
+    env_file:
+      - .env
+    ports:
+      - '8080:8080'
+
   celery-worker:
     image: ${DOCKER_REPOSITORY}/app:${DOCKER_APP_VERSION}
     env_file:

@@ -57,7 +57,6 @@ INSTALLED_APPS = [
 
 ]
 
-
 AUTH_USER_MODEL = 'accounts.Account'
 
 REST_FRAMEWORK = {
