@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
@@ -9,43 +11,51 @@ from rest_framework.authtoken.models import Token
 from accounts.models.country import DistrictModel
 
 
+def upload_location(instance, filename):
+    ext = filename.split('.')[-1]
+    file_path = 'accounts/avatars/{user_id}-{phone_number}'.format(
+        user_id=str(instance.id), phone_number='{}.{}'.format(uuid4().hex, ext))
+    return file_path
+
+
 class MyAccountManager(BaseUserManager):
-    def create_user(self, email, phone_number, password=None):
-        if not email:
-            raise ValueError("Users must have email")
+    def create_user(self, f_name, phone_number, password=None):
+
         if not phone_number:
             raise ValueError("Users must have phone number")
 
         user = self.model(
-            email=self.normalize_email(email),
+            f_name=f_name,
             phone_number=phone_number,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, phone_number, password):
+    def create_superuser(self, f_name, phone_number, password):
         user = self.create_user(
-            email=self.normalize_email(email),
+            f_name=f_name,
             password=password,
             phone_number=phone_number,
         )
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
+        user.is_speaker = True
         user.save(using=self._db)
         return user
 
 
 class Account(AbstractBaseUser):
     email = models.EmailField(verbose_name="email", max_length=60, unique=True, blank=True, null=True)
-    phone_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, unique=True)
     f_name = models.CharField(max_length=50, blank=True, null=True)
     l_name = models.CharField(max_length=50, blank=True, null=True)
     sex = models.CharField(max_length=50, blank=True, null=True)
     date_birth = models.DateTimeField(blank=True, null=True)
     district = models.ForeignKey(DistrictModel, on_delete=models.SET_NULL, null=True, blank=True)
     speciality = models.CharField(max_length=255, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to=upload_location, null=True, blank=True)
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
 
@@ -53,14 +63,15 @@ class Account(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    is_speaker = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = ['f_name', 'l_name', 'sex']
+    REQUIRED_FIELDS = ['f_name']
 
     objects = MyAccountManager()
 
     def __str__(self):
-        return str(self.email)
+        return self.phone_number
 
     def has_perm(self, perm, obj=None):
         return self.is_admin
