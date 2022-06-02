@@ -143,5 +143,7 @@ docker/nginx/letsencrypt/
 
 /media/
 /static/
+/media_cdn/
+/static_cdn/
 streaming/media/
 streaming/static/
