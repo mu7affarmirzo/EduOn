@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'courses.apps.CoursesConfig',
     'orders.apps.OrdersConfig',
+    'wallet.apps.WalletConfig',
 
     'rest_framework',
     'rest_framework.authtoken',
