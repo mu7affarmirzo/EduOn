@@ -26,3 +26,12 @@ class TransferModel(models.Model):
     def __str__(self):
         return str(self.tr_id)
 
+
+class CardModel(models.Model):
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    card_number = models.CharField(max_length=255)
+    expire = models.CharField(max_length=255)
+
+    def __str__(self):
+        return str(self.card_number)
+
