@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.v1.wallet.serializers import TransferSerializer, CardSerializer
+from api.v1.wallet.serializers import TransferSerializer, CardSerializer, WalletHistorySerializer
 from wallet.models import WalletModel, TransferModel, CardModel
 
 WALLET_URL = config('WALLET_URL')
@@ -54,6 +54,8 @@ def info_wallet(request):
     return Response(data.json())
 
 
+
+
 @swagger_auto_schema(method="post", tags=["wallet"], request_body=TransferSerializer)
 @permission_classes((IsAuthenticated,))
 @api_view(['POST'])
@@ -67,8 +69,6 @@ def transfer_to_wallet(request):
         serializers = TransferSerializer(data=request.data)
         if serializers.is_valid():
             data = serializers.data
-            print(data['number'])
-            print(wallet.card_number)
 
             payload = {
                 "id": "{{$randomUUID}}",
@@ -87,6 +87,73 @@ def transfer_to_wallet(request):
                 return Response(status.HTTP_404_NOT_FOUND)
 
             return Response(resp_data.json())
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(method="post", tags=["wallet"], request_body=TransferSerializer)
+@permission_classes((IsAuthenticated,))
+@api_view(['POST'])
+def withdraw_from_wallet(request):
+    try:
+        wallet = WalletModel.objects.get(owner=request.user)
+    except WalletModel.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'POST':
+        serializers = TransferSerializer(data=request.data)
+        if serializers.is_valid():
+            data = serializers.data
+
+            payload = {
+                "id": "{{$randomUUID}}",
+                "method": "transfer.proceed",
+                "params": {
+                    "number": f"{wallet.card_number}",
+                    "expire": f"{wallet.expire}",
+                    "receiver": f"{data['number']}",
+                    "amount": f"{data['amount']}",
+                }
+            }
+            try:
+                resp_data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
+                TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
+            except:
+                return Response(status.HTTP_404_NOT_FOUND)
+
+            return Response(resp_data.json())
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(method="post", tags=["wallet"], request_body=WalletHistorySerializer)
+@permission_classes((IsAuthenticated,))
+@api_view(['POST'])
+def history_wallet(request):
+    try:
+        wallet = WalletModel.objects.get(owner=request.user)
+    except WalletModel.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'POST':
+        serializers = WalletHistorySerializer(data=request.data)
+        if serializers.is_valid():
+            data = serializers.data
+
+            payload = {
+                "id": "{{$randomUUID}}",
+                "method": "wallet.history",
+                "params": {
+                    "number": wallet.card_number,
+                    "expire": wallet.expire,
+                    "start_date": f"{data['start_date']}",
+                    "end_date": f"{data['end_date']}",
+                    }
+                }
+            try:
+                data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
+            except:
+                return Response(status.HTTP_404_NOT_FOUND)
+
+            return Response(data.json())
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -130,18 +197,26 @@ class CardDetailView(APIView):
         serializer = CardSerializer(card)
         return Response(serializer.data)
 
+    @swagger_auto_schema(tags=['card'], request_body=CardSerializer)
+    def put(self, request, pk, format=None):
+        card = self.get_object(pk)
+
+        if card.owner.id != request.user.id:
+            return Response({'response': "You don't have the permission to get that."})
+
+        serializer = CardSerializer(card, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @swagger_auto_schema(tags=['card'])
     def delete(self, request, pk, format=None):
-        try:
-            card = CardModel.objects.get(id=pk)
-        except CardModel.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
+        card = self.get_object(pk)
         user = request.user
 
         if card.owner.id != user.id:
             return Response({'response': "You don't have the permission to delete that."})
-        card = self.get_object(pk)
         card.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

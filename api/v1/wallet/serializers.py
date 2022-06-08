@@ -9,6 +9,11 @@ class TransferSerializer(serializers.Serializer):
     amount = serializers.IntegerField(required=False)
 
 
+class WalletHistorySerializer(serializers.Serializer):
+    start_date = serializers.DateField(required=False)
+    end_date = serializers.DateField(required=False)
+
+
 class CardSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField('get_username_from_owner')
 
