@@ -1,13 +1,11 @@
 from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.v1.orders.serializers import CartSerializer
-from orders.models import CartModel, CartItemModel
 from orders.models.cart import CartModel
 
 
@@ -29,11 +27,15 @@ class CartListView(APIView):
     @swagger_auto_schema(tags=['cart'], request_body=CartSerializer)
     def post(self, request, format=None):
         account = request.user
-        course = CartModel(owner=account)
-        serializer = CartSerializer(course, data=request.data)
+        cart = CartModel(owner=account)
+
+        serializer = CartSerializer(cart, data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if CartModel.objects.filter(course=request.data['course']).exists():
+                return Response({'message': 'This course already exists'})
+            else:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

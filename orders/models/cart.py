@@ -36,3 +36,6 @@ class CartModel(models.Model):
     def __str__(self):
         return f"{self.owner.get_username()}-{self.course.name}"
 
+    class Meta:
+        unique_together = ('owner', 'course',)
+

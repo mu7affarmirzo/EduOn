@@ -67,7 +67,7 @@ def step_one(request):
             }
             return Response(data=data)
 
-    return Response(r.json())
+        return Response(r.json())
 
 
 @swagger_auto_schema(method="post", tags=["accounts"])

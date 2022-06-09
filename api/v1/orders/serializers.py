@@ -6,4 +6,4 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartModel
-        fields = ['course']
+        fields = ['id', 'course']
