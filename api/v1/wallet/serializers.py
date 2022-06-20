@@ -1,6 +1,6 @@
 from rest_framework import serializers
 # from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
-from wallet.models import CardModel
+from wallet.models import CardModel, VoucherModel
 
 
 class TransferSerializer(serializers.Serializer):
@@ -28,3 +28,9 @@ class CardSerializer(serializers.ModelSerializer):
     def get_username_from_owner(self, card):
         owner = card.owner.phone_number
         return owner
+
+
+class VoucherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VoucherModel
+        fields = '__all__'

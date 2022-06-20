@@ -1,4 +1,5 @@
 import requests
+
 from decouple import config
 from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
@@ -8,11 +9,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.v1.wallet.serializers import TransferSerializer, CardSerializer, WalletHistorySerializer
-from wallet.models import WalletModel, TransferModel, CardModel
+from api.v1.wallet.serializers import TransferSerializer, CardSerializer, WalletHistorySerializer, VoucherSerializer
+from api.v1.wallet.utils import login_to
+from eduon_v1.settings import WALLET_TOKEN
+from wallet.models import WalletModel, TransferModel, CardModel, VoucherModel
+
 
 WALLET_URL = config('WALLET_URL')
-WALLET_TOKEN = config('WALLET_TOKEN')
 HEADER = {"token": f"{WALLET_TOKEN}"}
 
 PAYLOAD = {
@@ -20,16 +23,6 @@ PAYLOAD = {
     "method": "",
     "params": {}
 }
-
-#
-# class IsOwnerOrReadOnly(permissions.BasePermission):
-#
-#     def has_object_permission(self, request, view, obj):
-#
-#         if request.method in permissions.SAFE_METHODS:
-#             return True
-#
-#         return obj.owner == request.user
 
 
 @swagger_auto_schema(method="get", tags=["wallet"])
@@ -49,11 +42,20 @@ def info_wallet(request):
             "expire": wallet.expire
             }
         }
-    data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
+    try:
+        data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
+    except:
+        return Response({'message': 'Service is not working.'})
 
-    return Response(data.json())
-
-
+    if data.json()['status']:
+        return Response(data.json())
+    else:
+        token = login_to()
+        try:
+            data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{token}"})
+        except:
+            return Response({'message': 'Service is not working.'})
+        return Response(data.json())
 
 
 @swagger_auto_schema(method="post", tags=["wallet"], request_body=TransferSerializer)
@@ -82,11 +84,19 @@ def transfer_to_wallet(request):
             }
             try:
                 resp_data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
-                TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
+                if resp_data.json()['status']:
+                    return Response(resp_data.json())
+                else:
+                    token = login_to()
+                    try:
+                        resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{token}"})
+                        TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
+                    except:
+                        return Response({'message': 'Service is not working.'})
+                return Response(resp_data.json())
             except:
                 return Response(status.HTTP_404_NOT_FOUND)
 
-            return Response(resp_data.json())
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -150,6 +160,7 @@ def history_wallet(request):
                 }
             try:
                 data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
+                print(WALLET_TOKEN)
             except:
                 return Response(status.HTTP_404_NOT_FOUND)
 
@@ -220,3 +231,23 @@ class CardDetailView(APIView):
         card.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class VoucherListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(tags=['wallet'])
+    def get(self, request, format=None):
+        account = request.user
+        vouchers = VoucherModel.objects.filter(owner=account)
+        serializer = VoucherSerializer(vouchers, many=True)
+        return Response(serializer.data)
+
+    # @swagger_auto_schema(tags=['card'], request_body=CardSerializer)
+    # def post(self, request, format=None):
+    #     account = request.user
+    #     card = CardModel(owner=account)
+    #     serializer = CardSerializer(card, data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

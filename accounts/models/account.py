@@ -10,7 +10,7 @@ from rest_framework.authtoken.models import Token
 
 from accounts.models.country import DistrictModel
 from api.v1.wallet.utils import create_wallet_util
-from wallet.models import WalletModel
+from wallet.models import WalletModel, VoucherModel
 
 
 def upload_location(instance, filename):
@@ -103,4 +103,15 @@ def create_wallet(sender, instance=None, created=False, **kwargs):
             owner=instance,
             card_number=card_number,
             expire=expire,
+        )
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_voucher(sender, instance=None, created=False, **kwargs):
+    if created:
+        value = 50000
+
+        VoucherModel.objects.create(
+            owner=instance,
+            value=value,
         )

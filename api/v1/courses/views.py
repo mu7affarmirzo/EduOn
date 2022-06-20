@@ -27,6 +27,9 @@ class CommentsListView(APIView):
 
     @swagger_auto_schema(tags=['comments'])
     def get(self, request, format=None):
+
+        # TODO: get comments by course
+
         snippets = CommentsModel.objects.all()
         serializer = CommentsSerializer(snippets, many=True)
         return Response(serializer.data)
