@@ -1,5 +1,6 @@
 import requests
 from decouple import config
+from django.conf import settings
 from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -12,10 +13,12 @@ from courses.models.courses import CourseModel
 from orders.models.cart import CartModel
 from wallet.models import WalletModel, TransferModel
 from api.v1.wallet.utils import login_to
-from eduon_v1.settings import WALLET_TOKEN
+
+EDUON_WALLET = config('EDUON_WALLET')
 
 WALLET_URL = config('WALLET_URL')
-HEADER = {"token": f"{WALLET_TOKEN}"}
+HEADER = {"token": f"{settings.WALLET_TOKEN}"}
+
 
 class CartListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -82,20 +85,32 @@ class ProceedOrder(APIView):
         except CartModel.DoesNotExist:
             raise Http404
 
-    def get_wallet(self, account):
+    @staticmethod
+    def get_wallet(account):
         try:
             return WalletModel.objects.get(owner=account)
         except WalletModel.DoesNotExist:
             raise Http404
 
-    def get_cart_items(self, account):
+    @staticmethod
+    def get_cart_items(account):
         try:
             return CartModel.objects.filter(owner=account).values()
         except CartModel.DoesNotExist:
             raise Http404
 
+    def cancel_transfer(self, tr_id):
+        pass
+
     @staticmethod
-    def transfer_money(wallet, receiver, amount):
+    def transfer_money(wallet, receiver, amount, is_referral):
+        if is_referral:
+            edu_on_share = amount * 0.1
+            speaker_share = amount - edu_on_share
+        else:
+            edu_on_share = amount * 0.3
+            speaker_share = amount - edu_on_share
+
         payload = {
             "id": "{{$randomUUID}}",
             "method": "transfer.proceed",
@@ -103,26 +118,58 @@ class ProceedOrder(APIView):
                 "number": f"{wallet.card_number}",
                 "expire": f"{wallet.expire}",
                 "receiver": f"{receiver}",
-                "amount": f"{amount}",
+                "amount": f"{speaker_share}",
+            }
+        }
+        eduon_payload = {
+            "id": "{{$randomUUID}}",
+            "method": "transfer.proceed",
+            "params": {
+                "number": f"{wallet.card_number}",
+                "expire": f"{wallet.expire}",
+                "receiver": f"{EDUON_WALLET}",
+                "amount": f"{edu_on_share}",
             }
         }
         try:
-            resp_data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
+            resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
             if resp_data.json()['status']:
-                return True
+                eduon_resp_data = requests.post(url=WALLET_URL, json=eduon_payload,
+                                                headers={"token": f"{settings.WALLET_TOKEN}"})
+                if not eduon_resp_data.json()['status']:
+                    # TODO: cancel speaker transaction
+                    pass
+
+            if resp_data.json()['status']:
+                context = {
+                    'status': True,
+                    'tr_id_speaker': resp_data.json()['result']['tr_id'],
+                    'tr_id_eduon': eduon_resp_data.json()['result']['tr_id']
+                }
+                return context
             else:
                 token = login_to()
                 try:
                     resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{token}"})
-                    # for enrolled course
-                    TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
-                    # for speaker
-                    TransferModel.objects.create(wallet=receiver, tr_id=resp_data.json()['result']['tr_id'])
+                    eduon_resp_data = requests.post(url=WALLET_URL, json=eduon_payload, headers={"token": f"{token}"})
+
                 except:
-                    return "Failed latest"
+                    return {'status': False, 'message': "Transaction failed!"}
+                # TODO: transaction to EduOn wallet
+                # TODO: remove from cart and add to enrolled course
+
+            try:
+                # TODO: change TransferModel to many to many relation
+                # for enrolled course
+                TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
+                # for speaker
+                TransferModel.objects.create(wallet=receiver, tr_id=resp_data.json()['result']['tr_id'])
+            except:
+                return {'status': True, 'message': "TransferModel object create failed!", 'tr_id': resp_data.json()['result']['tr_id']}
+
             return {'status': True, 'tr_id': resp_data.json()['result']['tr_id']}
         except:
-            return "Failed"
+            return {'status': False, 'message': "Transaction failed!"}
 
     @swagger_auto_schema(tags=['order'])
     def post(self, request, format=None):
@@ -140,18 +187,23 @@ class ProceedOrder(APIView):
             try:
                 each_course = CourseModel.objects.get(id=course['course_id'])
                 # TODO: optimization needed for better exception handling
-                transfer_info_context[f'{each_course}'] = {
-                        'speakers_wallet': str(each_course.course_owner.wallet),
-                        'speakers_wallet_expire': str(each_course.course_owner.wallet.expire),
-                        'transfer_status': str(self.transfer_money(
-                            wallet,
-                            each_course.course_owner.wallet,
-                            each_course.price
-                        ))
-                    }
-
             except CourseModel.DoesNotExist:
-                pass
+                transfer_info_context[f'{course}'] = {
+                    'status': False,
+                    'message': 'Retrieving this course failed!'
+                }
+                return Response(transfer_info_context)
+
+            transfer_info_context[f'{each_course}'] = {
+                    'speakers_wallet': str(each_course.course_owner.wallet),
+                    'speakers_wallet_expire': str(each_course.course_owner.wallet.expire),
+                    'transfer_status': str(self.transfer_money(
+                        wallet,
+                        each_course.course_owner.wallet,
+                        each_course.price,
+                        each_course.is_referral
+                    ))
+                }
 
         return Response(transfer_info_context)
 

@@ -4,9 +4,10 @@ from orders.models.cart import CartModel, CartItemModel
 
 class CartSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(method_name='get_price')
+
     class Meta:
         model = CartModel
-        fields = ['id', 'course', 'price']
+        fields = ['id', 'course', 'price', 'is_referral']
 
     def get_price(self, obj):
         return obj.course.price

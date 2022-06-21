@@ -1,3 +1,5 @@
+import os
+
 import requests
 
 from decouple import config
@@ -11,12 +13,14 @@ from rest_framework.views import APIView
 
 from api.v1.wallet.serializers import TransferSerializer, CardSerializer, WalletHistorySerializer, VoucherSerializer
 from api.v1.wallet.utils import login_to
-from eduon_v1.settings import WALLET_TOKEN
+# from eduon_v1.settings import WALLET_TOKEN
+from django.conf import settings
 from wallet.models import WalletModel, TransferModel, CardModel, VoucherModel
 
 
 WALLET_URL = config('WALLET_URL')
-HEADER = {"token": f"{WALLET_TOKEN}"}
+# HEADER = {"token": f"{os.environ.get('WALLET_TOKEN')}"}
+HEADER = {"token": f"{settings.WALLET_TOKEN}"}
 
 PAYLOAD = {
     "id": "{{$randomUUID}}",
@@ -43,7 +47,7 @@ def info_wallet(request):
             }
         }
     try:
-        data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
+        data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
     except:
         return Response({'message': 'Service is not working.'})
 
@@ -83,7 +87,7 @@ def transfer_to_wallet(request):
                 }
             }
             try:
-                resp_data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
+                resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
                 if resp_data.json()['status']:
                     return Response(resp_data.json())
                 else:
@@ -125,7 +129,7 @@ def withdraw_from_wallet(request):
                 }
             }
             try:
-                resp_data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
+                resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
                 TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
             except:
                 return Response(status.HTTP_404_NOT_FOUND)
@@ -159,8 +163,7 @@ def history_wallet(request):
                     }
                 }
             try:
-                data = requests.post(url=WALLET_URL, json=payload, headers=HEADER)
-                print(WALLET_TOKEN)
+                data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
             except:
                 return Response(status.HTTP_404_NOT_FOUND)
 

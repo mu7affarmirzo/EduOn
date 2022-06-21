@@ -33,7 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = get_list(os.environ.get("ALLOWED_HOSTS", "eduon.uz,localhost,127.0.0.1,0.0.0.0"))
 
-WALLET_TOKEN = "dJJIUTjzIjiLX3d8dEEaZKFIbETrTqPgiHSbyQ3yADeKWZ6HbIVBKYkYnNK8fPp9"
+WALLET_TOKEN = os.environ.get("WALLET_TOKEN", "wtf")
 
 # Application definition
 

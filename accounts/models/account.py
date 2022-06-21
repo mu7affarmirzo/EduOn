@@ -96,6 +96,7 @@ def create_wallet(sender, instance=None, created=False, **kwargs):
     if created:
 
         data = create_wallet_util(instance.phone_number)
+        print(f"data_inside_db: {data}")
         card_number = data['result']['card_number']
         expire = data['result']['expire']
 
