@@ -55,10 +55,12 @@ def create_wallet_util(phone_number):
         return Response(data.json())
     else:
         token = login_to()
-        print(f'token: {token}')
         try:
             data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{token}"})
-            print(f"data: {data.json()}")
+
+            if not data.json()['status']:
+                return {'result': {'card_number': '0000', 'expire': '0000'}}
+
         except:
             return {'result': {'card_number': '0000', 'expire': '0000'}}
         return data.json()
