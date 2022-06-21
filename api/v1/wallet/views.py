@@ -167,6 +167,15 @@ def history_wallet(request):
             except:
                 return Response(status.HTTP_404_NOT_FOUND)
 
+            if data.json()['status']:
+                return Response(data.json())
+            else:
+                token = login_to()
+                try:
+                    data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{token}"})
+                except:
+                    return Response({'message': 'Service is not working.'})
+
             return Response(data.json())
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 

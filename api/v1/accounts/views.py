@@ -19,7 +19,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import Otp, DeviceModel
 from accounts.models.account import Account
 from api.v1.accounts.serializers import RegistrationSerializer, AccountSerializer, OtpSerializer, \
-    AccountPropertiesSerializers, ChangePasswordSerializer, DevicesSerializer, DeactivateAccountSerializer
+    AccountPropertiesSerializers, ChangePasswordSerializer, DevicesSerializer, DeactivateAccountSerializer, \
+    StepTwoSerializer
 
 
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=OtpSerializer)
@@ -70,7 +71,7 @@ def step_one(request):
         return Response(r.json())
 
 
-@swagger_auto_schema(method="post", tags=["accounts"])
+@swagger_auto_schema(method="post", tags=["accounts"], request_body=StepTwoSerializer)
 @api_view(['POST'])
 def step_two(request):
     if request.method == 'POST':
@@ -85,7 +86,7 @@ def step_two(request):
             try:
                 user = Account.objects.get(phone_number=mobile_user.mobile)
             except:
-                return Response({'message': 'User is not registered'})
+                return Response({'message': False})
 
             refresh = RefreshToken.for_user(user)
             context['jwt_token'] = {
@@ -96,7 +97,7 @@ def step_two(request):
         else:
             return Response({'message': 'The code is not correct'})
 
-    return Response({'status': 'Successfull'})
+    return Response({'message': True})
 
 
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=RegistrationSerializer)

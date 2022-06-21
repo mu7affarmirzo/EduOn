@@ -87,6 +87,14 @@ class OtpSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class StepTwoSerializer(serializers.Serializer):
+    otp_token = serializers.CharField(max_length=255)
+    otp = serializers.CharField(max_length=255)
+
+    class Meta:
+        fields = '__all__'
+
+
 class ChangePasswordSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)

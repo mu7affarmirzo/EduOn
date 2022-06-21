@@ -100,10 +100,25 @@ class ProceedOrder(APIView):
             raise Http404
 
     def cancel_transfer(self, tr_id):
-        pass
+        payload = {
+            "id": "{{$randomUUID}}",
+            "method": "transfer.cancel",
+            "params": {
+                "tr_id": {tr_id}
+            }
+        }
+        resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
+        if not resp_data.json()['status']:
+            token = login_to()
+            try:
+                resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{token}"})
+            except:
+                return {'message': False}
+            return resp_data.json()
+        else:
+            return resp_data.json()
 
-    @staticmethod
-    def transfer_money(wallet, receiver, amount, is_referral):
+    def transfer_money(self, wallet, receiver, amount, is_referral):
         if is_referral:
             edu_on_share = amount * 0.1
             speaker_share = amount - edu_on_share
@@ -131,43 +146,67 @@ class ProceedOrder(APIView):
                 "amount": f"{edu_on_share}",
             }
         }
+
+        context = {}
+
         try:
-            resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
-            if resp_data.json()['status']:
+            speaker_resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
+            if speaker_resp_data.json()['status']:
                 eduon_resp_data = requests.post(url=WALLET_URL, json=eduon_payload,
                                                 headers={"token": f"{settings.WALLET_TOKEN}"})
                 if not eduon_resp_data.json()['status']:
-                    # TODO: cancel speaker transaction
-                    pass
-
-            if resp_data.json()['status']:
-                context = {
-                    'status': True,
-                    'tr_id_speaker': resp_data.json()['result']['tr_id'],
-                    'tr_id_eduon': eduon_resp_data.json()['result']['tr_id']
-                }
-                return context
+                    self.cancel_transfer(speaker_resp_data.json()['result']['tr_id'])
+                    context = {
+                        'status': True,
+                        'tr_id_speaker': speaker_resp_data.json()['result']['tr_id'],
+                        'tr_id_eduon': eduon_resp_data.json()['result']['tr_id']
+                    }
+                    return context
+                else:
+                    context = {
+                        'status': True,
+                        'tr_id_speaker': speaker_resp_data.json()['result']['tr_id'],
+                        'tr_id_eduon': eduon_resp_data.json()['result']['tr_id']
+                    }
+                    return context
             else:
                 token = login_to()
                 try:
-                    resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{token}"})
-                    eduon_resp_data = requests.post(url=WALLET_URL, json=eduon_payload, headers={"token": f"{token}"})
+                    speaker_resp_data = requests.post(url=WALLET_URL, json=payload,
+                                                      headers={"token": f"{token}"})
+                    if speaker_resp_data.json()['status']:
+                        eduon_resp_data = requests.post(url=WALLET_URL, json=eduon_payload,
+                                                        headers={"token": f"{token}"})
+                        if not eduon_resp_data.json()['status']:
+                            self.cancel_transfer(speaker_resp_data.json()['result']['tr_id'])
+                            context = {
+                                'status': True,
+                                'tr_id_speaker': speaker_resp_data.json()['result']['tr_id'],
+                                'tr_id_eduon': eduon_resp_data.json()['result']['tr_id']
+                            }
+                            return context
+                        else:
+                            context = {
+                                'status': True,
+                                'tr_id_speaker': speaker_resp_data.json()['result']['tr_id'],
+                                'tr_id_eduon': eduon_resp_data.json()['result']['tr_id']
+                            }
+                            return context
 
                 except:
                     return {'status': False, 'message': "Transaction failed!"}
-                # TODO: transaction to EduOn wallet
                 # TODO: remove from cart and add to enrolled course
 
             try:
                 # TODO: change TransferModel to many to many relation
                 # for enrolled course
-                TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
+                TransferModel.objects.create(wallet=wallet, tr_id=speaker_resp_data.json()['result']['tr_id'])
                 # for speaker
-                TransferModel.objects.create(wallet=receiver, tr_id=resp_data.json()['result']['tr_id'])
+                TransferModel.objects.create(wallet=receiver, tr_id=speaker_resp_data.json()['result']['tr_id'])
             except:
-                return {'status': True, 'message': "TransferModel object create failed!", 'tr_id': resp_data.json()['result']['tr_id']}
+                return {'status': True, 'message': "TransferModel object create failed!", 'tr_id': speaker_resp_data.json()['result']['tr_id']}
 
-            return {'status': True, 'tr_id': resp_data.json()['result']['tr_id']}
+            return {'status': True, 'tr_id': speaker_resp_data.json()['result']['tr_id']}
         except:
             return {'status': False, 'message': "Transaction failed!"}
 
@@ -201,7 +240,7 @@ class ProceedOrder(APIView):
                         wallet,
                         each_course.course_owner.wallet,
                         each_course.price,
-                        each_course.is_referral
+                        course['is_referral']
                     ))
                 }
 
