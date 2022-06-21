@@ -9,6 +9,8 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
 from accounts.models.country import DistrictModel
+from api.v1.wallet.utils import create_wallet_util
+from wallet.models import WalletModel, VoucherModel
 
 
 def upload_location(instance, filename):
@@ -87,3 +89,30 @@ class Account(AbstractBaseUser):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_wallet(sender, instance=None, created=False, **kwargs):
+    if created:
+
+        data = create_wallet_util(instance.phone_number)
+        print(f"data_inside_db: {data}")
+        card_number = data['result']['card_number']
+        expire = data['result']['expire']
+
+        WalletModel.objects.create(
+            owner=instance,
+            card_number=card_number,
+            expire=expire,
+        )
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_voucher(sender, instance=None, created=False, **kwargs):
+    if created:
+        value = 50000
+
+        VoucherModel.objects.create(
+            owner=instance,
+            value=value,
+        )

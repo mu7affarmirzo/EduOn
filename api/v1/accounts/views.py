@@ -67,7 +67,7 @@ def step_one(request):
             }
             return Response(data=data)
 
-    return Response(r.json())
+        return Response(r.json())
 
 
 @swagger_auto_schema(method="post", tags=["accounts"])
@@ -75,7 +75,7 @@ def step_one(request):
 def step_two(request):
     if request.method == 'POST':
         data = request.data
-
+        context = {}
         try:
             mobile_user = Otp.objects.get(otp=data['otp_token'])
         except:
@@ -86,7 +86,13 @@ def step_two(request):
                 user = Account.objects.get(phone_number=mobile_user.mobile)
             except:
                 return Response({'message': 'User is not registered'})
-            return Response({'message': 'This user is registered.', 'token': Token.objects.get(user=user).key})
+
+            refresh = RefreshToken.for_user(user)
+            context['jwt_token'] = {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }
+            return Response(context)
         else:
             return Response({'message': 'The code is not correct'})
 
@@ -106,7 +112,7 @@ def registration_view(request):
             data['email'] = account.email
             data['phone_number'] = account.phone_number
             refresh = RefreshToken.for_user(account)
-            data['jwt-token'] = {
+            data['jwt_token'] = {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
             }

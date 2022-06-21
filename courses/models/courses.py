@@ -1,8 +1,16 @@
+from uuid import uuid4
+
 from django.db import models
 from django.conf import settings
 
 from accounts.models import Account
 from courses.models.categories import CategoriesModel, SubCategoriesModel
+
+
+def upload_location(instance, filename):
+    ext = filename.split('.')[-1]
+    file_path = 'course/covers/{title}'.format(title='{}.{}'.format(uuid4().hex, ext))
+    return file_path
 
 
 class CourseModel(models.Model):
@@ -26,6 +34,7 @@ class CourseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     discount_price = models.FloatField(default=0, null=True)
+    cover_img = models.ImageField(upload_to=upload_location, null=True, blank=True)
 
     # fav_courses = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='fav_cource', blank=True)
 

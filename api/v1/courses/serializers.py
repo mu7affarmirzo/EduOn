@@ -17,7 +17,7 @@ class CommentsSerializer(serializers.ModelSerializer):
             'username'
         ]
 
-    def get_username_from_author(self, comment):
+    def get_username_from_author(self, instance, comment):
         username = comment.author.phone_number
         return username
 
