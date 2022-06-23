@@ -7,7 +7,7 @@ from api.v1.accounts.views import registration_view, \
     step_one, step_two, \
     update_account_view, \
     ChangePasswordView, DevicesListView, \
-    DevicesDetailView, account_detail_view, deactivate_account_view
+    DevicesDetailView, account_detail_view, deactivate_account_view, become_speaker_view
 
 app_name = 'accounts'
 
@@ -18,6 +18,7 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('list', account_list_view, name='list'),
     path('update', update_account_view, name='update'),
+    path('become-speaker', become_speaker_view, name='become-speaker'),
     path('change-password/<int:pk>', ChangePasswordView.as_view(), name='update'),
 
     path('device', DevicesListView.as_view(), name='devices'),
