@@ -59,8 +59,11 @@ class AccountPropertiesSerializers(serializers.ModelSerializer):
             'email',
             'sex',
             'date_birth',
+            'country',
             'district',
             'speciality',
+            'profile_picture',
+            'is_speaker'
         ]
 
 

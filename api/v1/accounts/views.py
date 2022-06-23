@@ -174,7 +174,7 @@ def update_account_view(request):
         data = {}
         if serializer.is_valid():
             serializer.save()
-            data['response'] = "Account has been deactivated!"
+            data['response'] = "Account has been updated!"
             return Response(data=data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
