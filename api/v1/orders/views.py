@@ -147,8 +147,6 @@ class ProceedOrder(APIView):
             }
         }
 
-        context = {}
-
         try:
             speaker_resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
             if speaker_resp_data.json()['status']:

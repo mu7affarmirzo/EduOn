@@ -15,7 +15,6 @@ urlpatterns = [
     path('step-one/', step_one, name='step-one'),
     path('step-two/', step_two, name='step-two'),
     path('register', registration_view, name='registration'),
-    # path('login/', obtain_auth_token, name='login'),
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('list', account_list_view, name='list'),
     path('update', update_account_view, name='update'),
