@@ -63,6 +63,8 @@ class AccountPropertiesSerializers(serializers.ModelSerializer):
             'district',
             'speciality',
             'profile_picture',
+            'interests',
+            'about_me',
             'is_speaker'
         ]
 
