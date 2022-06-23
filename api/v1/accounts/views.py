@@ -80,24 +80,26 @@ def step_two(request):
         try:
             mobile_user = Otp.objects.get(otp=data['otp_token'])
         except:
-            return Response({'message': 'This token has not been found'})
+            return Response({'status': False, 'message': 'This token has not been found'})
 
         if pbkdf2_sha256.verify(data['otp'], mobile_user.otp):
             try:
                 user = Account.objects.get(phone_number=mobile_user.mobile)
             except:
-                return Response({'message': False})
+                return Response({'status': True, 'message': 'This user should be registered!'})
 
             refresh = RefreshToken.for_user(user)
             context['jwt_token'] = {
+                'status': True,
+                'message': 'This user had been registered before',
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
             }
             return Response(context)
         else:
-            return Response({'message': 'The code is not correct'})
+            return Response({'status': False, 'message': 'The code is not correct'})
 
-    return Response({'message': True})
+    return Response({'status': True, 'message': 'Code verified!'})
 
 
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=RegistrationSerializer)
