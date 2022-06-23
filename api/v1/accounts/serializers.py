@@ -67,6 +67,13 @@ class AccountPropertiesSerializers(serializers.ModelSerializer):
         ]
 
 
+class BecomeSpeakerSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Account
+        fields = ['is_speaker']
+
+
 class DeactivateAccountSerializer(serializers.ModelSerializer):
 
     class Meta:

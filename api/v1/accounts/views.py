@@ -20,7 +20,7 @@ from accounts.models import Otp, DeviceModel
 from accounts.models.account import Account
 from api.v1.accounts.serializers import RegistrationSerializer, AccountSerializer, OtpSerializer, \
     AccountPropertiesSerializers, ChangePasswordSerializer, DevicesSerializer, DeactivateAccountSerializer, \
-    StepTwoSerializer
+    StepTwoSerializer, BecomeSpeakerSerializers
 
 
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=OtpSerializer)
@@ -178,6 +178,21 @@ def update_account_view(request):
             serializer.save()
             data['response'] = "Account has been updated!"
             return Response(data=data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(method="put", tags=["accounts"], request_body=BecomeSpeakerSerializers)
+@api_view(['PUT'])
+@permission_classes((IsAuthenticated,))
+def become_speaker_view(request):
+
+    if request.method == 'PUT':
+        serializer = BecomeSpeakerSerializers(request.user, data=request.data)
+        data = {}
+        if serializer.is_valid():
+            serializer.save()
+            data['response'] = "Account has been updated!"
+            return Response(data=data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
