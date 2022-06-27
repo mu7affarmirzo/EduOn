@@ -91,30 +91,35 @@ class CommentsDetailView(APIView):
 
 
 class SubCategoriesListView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     swagger_auto_schema(request_body=SubCategoriesSerializer, tags=['SubCategories'])
     queryset = SubCategoriesModel.objects.all()
     serializer_class = SubCategoriesSerializer
 
 
 class SubCategoriesDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     swagger_auto_schema(request_body=SubCategoriesSerializer, tags=['SubCategories'])
     queryset = SubCategoriesModel.objects.all()
     serializer_class = SubCategoriesSerializer
 
 
 class CategoriesListView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     swagger_auto_schema(request_body=CategoriesSerializer, tags=['Categories'])
     queryset = CategoriesModel.objects.all()
     serializer_class = CategoriesSerializer
 
 
 class CategoriesDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     swagger_auto_schema(request_body=CategoriesSerializer, tags=['Categories'])
     queryset = CategoriesModel.objects.all()
     serializer_class = CategoriesSerializer
 
 
 class CoursesListView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     swagger_auto_schema(request_body=CourseSerializer, tags=['Courses'])
     queryset = CourseModel.objects.all()
     serializer_class = CourseSerializer

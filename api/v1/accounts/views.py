@@ -239,6 +239,7 @@ class DevicesListView(APIView):
 
     @swagger_auto_schema(tags=['devices'], request_body=DevicesSerializer)
     def post(self, request, format=None):
+        print(f"User-Agent: {request.headers['User-Agent']} - Origin: {request.headers['Origin']} - Host: {request.headers['Origin']}")
         account = request.user
         device = DeviceModel(owner=account)
         serializer = DevicesSerializer(device, data=request.data)
