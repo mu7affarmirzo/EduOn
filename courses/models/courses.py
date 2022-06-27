@@ -21,13 +21,11 @@ class CourseModel(models.Model):
     category = models.ForeignKey(CategoriesModel, related_name='courses', on_delete=models.SET_NULL, null=True)
     subcategory = models.ForeignKey(SubCategoriesModel, related_name='courses', on_delete=models.SET_NULL, null=True)
     course_owner = models.ForeignKey(Account, related_name='courses', on_delete=models.CASCADE)
-    image = models.CharField(max_length=255)
     key_words = models.CharField(max_length=255)
     what_to_learn = models.TextField()
     whom_this_course = models.TextField()
     students = models.CharField(max_length=255)
     price = models.BigIntegerField()
-    certificates = models.CharField(max_length=255)
     short_descr = models.TextField()
     recommendation = models.TextField()
     exchange_url = models.CharField(max_length=255)
@@ -35,8 +33,6 @@ class CourseModel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     discount_price = models.FloatField(default=0, null=True)
     cover_img = models.ImageField(upload_to=upload_location, null=True, blank=True)
-
-    # fav_courses = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='fav_cource', blank=True)
 
     def __str__(self):
         return self.name
