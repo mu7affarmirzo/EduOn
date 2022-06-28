@@ -16,6 +16,19 @@ from courses.models.categories import CategoriesModel, SubCategoriesModel
 from courses.models.comments import CommentsModel
 
 
+@swagger_auto_schema(tags=['comments'], method='post', request_body=CommentsSerializer)
+@permission_classes((IsAuthenticated,))
+@api_view(['POST'])
+def post_comment(request, format=None):
+    account = request.user
+    comment = CommentsModel(author=account)
+    serializer = CommentsSerializer(comment, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class CommentsListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -26,33 +39,11 @@ class CommentsListView(APIView):
             raise Http404
 
     @swagger_auto_schema(tags=['comments'])
-    def get(self, request, format=None):
+    def get(self, request, pk, format=None):
 
-        # TODO: get comments by course
-
-        snippets = CommentsModel.objects.all()
+        snippets = CommentsModel.objects.filter(course_id=pk)
         serializer = CommentsSerializer(snippets, many=True)
         return Response(serializer.data)
-
-    @swagger_auto_schema(tags=['comments'], request_body=CommentsSerializer)
-    def post(self, request, format=None):
-        account = request.user
-        comment = CommentsModel(author=account)
-        serializer = CommentsSerializer(comment, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class CommentsDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self, pk):
-        try:
-            return CommentsModel.objects.get(pk=pk)
-        except CommentsModel.DoesNotExist:
-            raise Http404
 
     @swagger_auto_schema(tags=['comments'], request_body=CommentsSerializer)
     def put(self, request, pk, format=None):
@@ -90,11 +81,61 @@ class CommentsDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+
+
+# class CommentsDetailView(APIView):
+#     permission_classes = [IsAuthenticated]
+#
+#     def get_object(self, pk):
+#         try:
+#             return CommentsModel.objects.get(pk=pk)
+#         except CommentsModel.DoesNotExist:
+#             raise Http404
+#
+#     @swagger_auto_schema(tags=['comments'], request_body=CommentsSerializer)
+#     def put(self, request, pk, format=None):
+#         try:
+#             comment = CommentsModel.objects.get(id=pk)
+#         except CommentsModel.DoesNotExist:
+#             return Response(status=status.HTTP_404_NOT_FOUND)
+#
+#         user = request.user
+#         if comment.author != user:
+#             return Response({'response': "You don't have the permission to edit that."})
+#
+#         comment = self.get_object(pk)
+#         serializer = CommentsSerializer(comment, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#
+#     @swagger_auto_schema(tags=['comments'])
+#     def delete(self, request, pk, format=None):
+#         try:
+#             comment = CommentsModel.objects.get(id=pk)
+#         except CommentsModel.DoesNotExist:
+#             return Response(status=status.HTTP_404_NOT_FOUND)
+#
+#         course_owner = comment.course.course_owner.id
+#         user = request.user
+#
+#         if comment.author.id != user.id and course_owner != user.id:
+#             return Response({'response': "You don't have the permission to delete that."})
+#         comment = self.get_object(pk)
+#         comment.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class SubCategoriesListView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     swagger_auto_schema(request_body=SubCategoriesSerializer, tags=['SubCategories'])
     queryset = SubCategoriesModel.objects.all()
     serializer_class = SubCategoriesSerializer
+
+    def get(self, request, *args, **kwargs):
+        return Response({'message': "no photo no video"})
 
 
 class SubCategoriesDetailView(RetrieveUpdateDestroyAPIView):
@@ -102,6 +143,9 @@ class SubCategoriesDetailView(RetrieveUpdateDestroyAPIView):
     swagger_auto_schema(request_body=SubCategoriesSerializer, tags=['SubCategories'])
     queryset = SubCategoriesModel.objects.all()
     serializer_class = SubCategoriesSerializer
+
+    def get(self, request, *args, **kwargs):
+        return Response({'message': "no photo"})
 
 
 class CategoriesListView(ListCreateAPIView):
