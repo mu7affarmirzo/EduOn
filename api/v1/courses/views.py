@@ -29,7 +29,7 @@ def post_comment(request, format=None):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CommentsListView(APIView):
+class CommentsOptionsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
