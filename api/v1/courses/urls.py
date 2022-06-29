@@ -11,8 +11,9 @@ urlpatterns = [
     path('categories/', CategoriesListView.as_view(), name='categories'),
     path('categories/<int:pk>', CategoriesDetailView.as_view(), name='categories-detail'),
 
-    path('comments/', CommentsListView.as_view(), name='comments'),
-    path('comments/<int:pk>', CommentsDetailView.as_view(), name='comments-detail'),
+    path('comments/', post_comment, name='comments'),
+    path('comments/<int:pk>', CommentsListView.as_view(), name='course-comments'),
+    # path('comments/<int:pk>', CommentsDetailView.as_view(), name='comments-detail'),
 
     path('fav-courses/', post_fav_course, name='fav-course'),
     path('list-fav-courses/', list_fav_course, name='list-fav-course'),

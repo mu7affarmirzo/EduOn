@@ -11,13 +11,13 @@ class CommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentsModel
         fields = [
+            'id',
             'text',
             'date_created',
-            'course',
             'username'
         ]
 
-    def get_username_from_author(self, instance, comment):
+    def get_username_from_author(self, comment):
         username = comment.author.phone_number
         return username
 
