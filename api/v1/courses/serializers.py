@@ -14,7 +14,8 @@ class CommentsSerializer(serializers.ModelSerializer):
             'id',
             'text',
             'date_created',
-            'username'
+            'username',
+            'course'
         ]
 
     def get_username_from_author(self, comment):
@@ -30,15 +31,17 @@ class FavCoursesSerializer(serializers.ModelSerializer):
         ]
 
 
-class CategoriesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CategoriesModel
-        fields = "__all__"
-
-
 class SubCategoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCategoriesModel
+        fields = "__all__"
+
+
+class CategoriesSerializer(serializers.ModelSerializer):
+    subcategory = SubCategoriesSerializer(many=True)
+
+    class Meta:
+        model = CategoriesModel
         fields = "__all__"
 
 

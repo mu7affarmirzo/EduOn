@@ -45,4 +45,8 @@ class FavCoursesModel(models.Model):
     def __str__(self):
         return str(f"{self.user.phone_number} - {self.course.name}")
 
-
+#
+# class ModuleModel(models.Model):
+#     course = models.ForeignKey(CourseModel, related_name='module', blank=True, on_delete=models.CASCADE)
+#     name = models.CharField(max_length=255)
+#     description = models.TextField()
