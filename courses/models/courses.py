@@ -7,6 +7,15 @@ from accounts.models import Account
 from courses.models.categories import CategoriesModel, SubCategoriesModel
 
 
+RATING_CHOICES =(
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
+)
+
+
 def upload_location(instance, filename):
     ext = filename.split('.')[-1]
     file_path = 'course/covers/{title}'.format(title='{}.{}'.format(uuid4().hex, ext))
@@ -24,7 +33,6 @@ class CourseModel(models.Model):
     key_words = models.CharField(max_length=255)
     what_to_learn = models.TextField()
     whom_this_course = models.TextField()
-    students = models.CharField(max_length=255)
     price = models.BigIntegerField()
     short_descr = models.TextField()
     recommendation = models.TextField()
@@ -33,6 +41,7 @@ class CourseModel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     discount_price = models.FloatField(default=0, null=True)
     cover_img = models.ImageField(upload_to=upload_location, null=True, blank=True)
+    trailer_url = models.URLField(max_length=255, null=True)
 
     def __str__(self):
         return self.name
@@ -45,8 +54,46 @@ class FavCoursesModel(models.Model):
     def __str__(self):
         return str(f"{self.user.phone_number} - {self.course.name}")
 
-#
-# class ModuleModel(models.Model):
-#     course = models.ForeignKey(CourseModel, related_name='module', blank=True, on_delete=models.CASCADE)
-#     name = models.CharField(max_length=255)
-#     description = models.TextField()
+
+class EnrolledCoursesModel(models.Model):
+    course = models.ForeignKey(CourseModel, related_name='enrolled_course', blank=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, related_name='enrolled_course', blank=True, null=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(f"{self.user.phone_number} - {self.course.name}")
+
+
+class RatingCoursesModel(models.Model):
+
+    course = models.ForeignKey(CourseModel, related_name='rating', blank=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, related_name='rating', blank=True, null=True, on_delete=models.SET_NULL)
+    rating = models.IntegerField(choices=RATING_CHOICES, null=True, blank=True)
+
+    def __str__(self):
+        return str(f"{self.user.phone_number} - {self.course.name} - {self.rating}")
+
+    class Meta:
+        unique_together = ('course', 'user')
+
+
+class ModuleModel(models.Model):
+    course = models.ForeignKey(CourseModel, related_name='module', blank=True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return str(f"{self.course.name} - {self.name}")
+
+
+class LessonsModel(models.Model):
+    module = models.ForeignKey(ModuleModel, related_name='lessons', blank=True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    video_lesson_url = models.URLField(max_length=255, null=True)
+    subtitle_url = models.URLField(max_length=255, null=True)
+    about = models.TextField(null=True)
+    resource_file = models.FileField(null=True)# TODO:
+    duration = models.DurationField(null=True)
+
+    def __str__(self):
+        return str(f"{self.module.name} - {self.name}")
+
+
