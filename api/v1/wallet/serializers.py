@@ -16,6 +16,7 @@ class WalletHistorySerializer(serializers.Serializer):
 
 class CardSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField('get_username_from_owner')
+    card_number = serializers.SerializerMethodField('get_card_number')
 
     class Meta:
         model = CardModel
@@ -28,6 +29,13 @@ class CardSerializer(serializers.ModelSerializer):
     def get_username_from_owner(self, card):
         owner = card.owner.phone_number
         return owner
+
+    def get_card_number(self, card):
+        try:
+            card_number = f"{card.card_number[:4]}********{card.card_number[-4:]}"
+        except:
+            card_number = card.card_number
+        return card_number
 
 
 class VoucherSerializer(serializers.ModelSerializer):

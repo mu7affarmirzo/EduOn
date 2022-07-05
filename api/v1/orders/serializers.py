@@ -1,13 +1,16 @@
 from rest_framework import serializers
+
+from api.v1.courses.serializers import CourseSerializer
 from orders.models.cart import CartModel, CartItemModel
 
 
 class CartSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(method_name='get_price')
+    course = CourseSerializer()
 
     class Meta:
         model = CartModel
-        fields = ['id', 'course', 'price', 'is_referral']
+        fields = ['id', 'price', 'is_referral', 'course']
 
     def get_price(self, obj):
         return obj.course.price

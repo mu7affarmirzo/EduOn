@@ -1,5 +1,5 @@
 from django.contrib import admin
-from wallet.models import WalletModel, TransferModel, VoucherModel
+from wallet.models import WalletModel, TransferModel, VoucherModel, CardModel
 
 admin.site.register(WalletModel)
 
@@ -11,3 +11,4 @@ class TransferModel(admin.ModelAdmin):
 
 
 admin.site.register(VoucherModel)
+admin.site.register(CardModel)
