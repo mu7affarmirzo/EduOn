@@ -23,14 +23,6 @@ class CommentsSerializer(serializers.ModelSerializer):
         return username
 
 
-class FavCoursesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FavCoursesModel
-        fields = [
-            'course',
-        ]
-
-
 class SubCategoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCategoriesModel
@@ -84,6 +76,14 @@ class CourseSerializer(serializers.ModelSerializer):
         return username
 
 
+class FavCoursesSerializer(serializers.ModelSerializer):
+    course = CourseSerializer()
+
+    class Meta:
+        model = FavCoursesModel
+        fields = [
+            'course',
+        ]
 
 
 

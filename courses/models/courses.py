@@ -54,6 +54,9 @@ class FavCoursesModel(models.Model):
     def __str__(self):
         return str(f"{self.user.phone_number} - {self.course.name}")
 
+    class Meta:
+        unique_together = ('course', 'user')
+
 
 class EnrolledCoursesModel(models.Model):
     course = models.ForeignKey(CourseModel, related_name='enrolled_course', blank=True, on_delete=models.CASCADE)
