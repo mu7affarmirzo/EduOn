@@ -2,6 +2,7 @@ import os
 import requests
 
 from decouple import config
+from django.db.utils import IntegrityError
 from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions
@@ -10,7 +11,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.v1.wallet.serializers import TransferSerializer, CardSerializer, WalletHistorySerializer, VoucherSerializer
+from api.v1.wallet.serializers import TransferSerializer, CardSerializer, WalletHistorySerializer, VoucherSerializer, \
+    CardAddSerializer
 from api.v1.wallet.utils import login_to, withdraw_from_wallet_service, transfer_service
 from django.conf import settings
 from wallet.models import WalletModel, TransferModel, CardModel, VoucherModel
@@ -153,14 +155,18 @@ class CardListView(APIView):
         serializer = CardSerializer(card, many=True)
         return Response(serializer.data)
 
-    @swagger_auto_schema(tags=['card'], request_body=CardSerializer)
+    @swagger_auto_schema(tags=['card'], request_body=CardAddSerializer)
     def post(self, request, format=None):
         account = request.user
         card = CardModel(owner=account)
-        serializer = CardSerializer(card, data=request.data)
+        serializer = CardAddSerializer(card, data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            try:
+                serializer.save()
+            except IntegrityError:
+                return Response({"status": False, "message": "This card already added!"})
+            resp_serializer = CardSerializer(card)
+            return Response(resp_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -216,13 +222,3 @@ class VoucherListView(APIView):
         vouchers = VoucherModel.objects.filter(owner=account)
         serializer = VoucherSerializer(vouchers, many=True)
         return Response(serializer.data)
-
-    # @swagger_auto_schema(tags=['card'], request_body=CardSerializer)
-    # def post(self, request, format=None):
-    #     account = request.user
-    #     card = CardModel(owner=account)
-    #     serializer = CardSerializer(card, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
