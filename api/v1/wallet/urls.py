@@ -11,5 +11,5 @@ urlpatterns = [
     path('history', history_wallet, name='history-of-wallet'),
     path('card', CardListView.as_view(), name='card-list'),
     path('card/<int:pk>', CardDetailView.as_view(), name='card-detail'),
-    path('vouchers', VoucherListView.as_view(), name='vouchers-list'),
+    # path('vouchers', VoucherListView.as_view(), name='vouchers-list'),
 ]

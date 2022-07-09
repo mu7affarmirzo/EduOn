@@ -14,6 +14,22 @@ class WalletHistorySerializer(serializers.Serializer):
     end_date = serializers.DateField(required=False)
 
 
+class CardAddSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField('get_username_from_owner')
+
+    class Meta:
+        model = CardModel
+        fields = [
+            'card_number',
+            'expire',
+            'owner'
+        ]
+
+    def get_username_from_owner(self, card):
+        owner = card.owner.phone_number
+        return owner
+
+
 class CardSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField('get_username_from_owner')
     card_number = serializers.SerializerMethodField('get_card_number')

@@ -36,6 +36,9 @@ class CardModel(models.Model):
     def __str__(self):
         return str(self.card_number)
 
+    class Meta:
+        unique_together = ('owner', 'card_number')
+
 
 class VoucherModel(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
