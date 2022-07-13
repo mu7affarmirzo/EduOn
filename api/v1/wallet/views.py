@@ -29,6 +29,10 @@ HEADER = {"token": f"{settings.WALLET_TOKEN}"}
 @api_view(['GET'])
 def info_wallet(request):
 
+
+    print(f"*******************************{request.user}")
+    if str(request.user) == "AnonymousUser":
+        return Response(status=status.HTTP_403_FORBIDDEN)
     try:
         wallet = WalletModel.objects.get(owner=request.user)
     except WalletModel.DoesNotExist:

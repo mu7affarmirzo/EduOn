@@ -3,6 +3,7 @@ from accounts.models.account import Account
 from accounts.models.card import CreditCardModel
 from accounts.models.country import *
 from accounts.models.code import *
+from accounts.models.otp import *
 
 
 class CountryAdmin(admin.ModelAdmin):
@@ -21,3 +22,4 @@ admin.site.register(ProvinceModel, CountryAdmin)
 admin.site.register(DistrictModel, CountryAdmin)
 
 admin.site.register(CodeModel)
+admin.site.register(Otp)
