@@ -24,6 +24,8 @@ class CommentsSerializer(serializers.ModelSerializer):
 
 
 class SubCategoriesSerializer(serializers.ModelSerializer):
+    # courses = CourseSerializer(many=True)
+
     class Meta:
         model = SubCategoriesModel
         fields = "__all__"
@@ -34,13 +36,6 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CategoriesModel
-        fields = "__all__"
-
-
-class EnrolledCoursesSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = EnrolledCoursesModel
         fields = "__all__"
 
 
@@ -83,6 +78,26 @@ class FavCoursesSerializer(serializers.ModelSerializer):
         model = FavCoursesModel
         fields = [
             'course',
+        ]
+
+
+class EnrolledCoursesSerializer(serializers.ModelSerializer):
+    course = CourseSerializer()
+
+    class Meta:
+        model = EnrolledCoursesModel
+        fields = [
+            'course',
+        ]
+
+
+class SubCategoryCoursesSerializer(serializers.ModelSerializer):
+    courses = CourseSerializer(many=True)
+
+    class Meta:
+        model = SubCategoriesModel
+        fields = [
+            'courses',
         ]
 
 
