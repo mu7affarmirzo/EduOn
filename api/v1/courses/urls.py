@@ -2,7 +2,6 @@ from django.urls import path, include
 from api.v1.courses.views import *
 
 app_name = 'courses'
-
 urlpatterns = [
     path('', CoursesListView.as_view(), name='courses'),
     path('<int:pk>', CoursesDetailView.as_view(), name='courses-detail'),
@@ -18,6 +17,10 @@ urlpatterns = [
     path('fav-courses/', post_fav_course, name='fav-course'),
     path('list-fav-courses/', list_fav_course, name='list-fav-course'),
     path('remove-fav-courses/<int:pk>', remove_fav_courses, name='remove-fav-course'),
+
+    path('enrolled-courses/', EnrolledCoursesView.as_view(), name='fav-course'),
+    path('uploaded-courses/', my_uploaded_course, name='uploaded-course'),
     # path('fav-courses-list', list_my_fav_courses, name='fav-course-list'),
 ]
+
 

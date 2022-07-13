@@ -65,6 +65,9 @@ class EnrolledCoursesModel(models.Model):
     def __str__(self):
         return str(f"{self.user.phone_number} - {self.course.name}")
 
+    class Meta:
+        unique_together = ('course', 'user')
+
 
 class RatingCoursesModel(models.Model):
 

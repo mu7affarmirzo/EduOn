@@ -10,8 +10,8 @@ from rest_framework.views import APIView
 
 from api.v1.courses.permissions import IsOwnerOrReadOnly
 from api.v1.courses.serializers import SubCategoriesSerializer, CategoriesSerializer, CourseSerializer, \
-    FavCoursesSerializer, CommentsSerializer
-from courses.models.courses import CourseModel, FavCoursesModel
+    FavCoursesSerializer, CommentsSerializer, SubCategoryCoursesSerializer, EnrolledCoursesSerializer
+from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel
 from courses.models.categories import CategoriesModel, SubCategoriesModel
 from courses.models.comments import CommentsModel
 
@@ -132,20 +132,17 @@ class SubCategoriesListView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     swagger_auto_schema(request_body=SubCategoriesSerializer, tags=['SubCategories'])
     queryset = SubCategoriesModel.objects.all()
-    serializer_class = SubCategoriesSerializer
+    serializer_class = SubCategoryCoursesSerializer
 
-    def get(self, request, *args, **kwargs):
-        return Response({'message': "no photo no video"})
+    # def get(self, request, *args, **kwargs):
+    #     return Response({'message': "no photo no video"})
 
 
 class SubCategoriesDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     swagger_auto_schema(request_body=SubCategoriesSerializer, tags=['SubCategories'])
     queryset = SubCategoriesModel.objects.all()
-    serializer_class = SubCategoriesSerializer
-
-    def get(self, request, *args, **kwargs):
-        return Response({'message': "no photo"})
+    serializer_class = SubCategoryCoursesSerializer
 
 
 class CategoriesListView(ListCreateAPIView):
@@ -174,6 +171,23 @@ class CoursesDetailView(RetrieveUpdateDestroyAPIView):
     swagger_auto_schema(request_body=CourseSerializer, tags=['Courses'])
     queryset = CourseModel.objects.all()
     serializer_class = CourseSerializer
+
+
+class EnrolledCoursesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            return CommentsModel.objects.get(pk=pk)
+        except CommentsModel.DoesNotExist:
+            raise Http404
+
+    @swagger_auto_schema(tags=['enrolled-courses'])
+    def get(self, request, format=None):
+
+        snippets = EnrolledCoursesModel.objects.filter(user=request.user)
+        serializer = EnrolledCoursesSerializer(snippets, many=True)
+        return Response(serializer.data)
 
 
 @swagger_auto_schema(method='POST', tags=['Fav courses'], request_body=FavCoursesSerializer)
@@ -211,6 +225,21 @@ def list_fav_course(request):
 
     if request.method == 'GET':
         serializer = FavCoursesSerializer(fav_course, many=True)
+        return Response(serializer.data)
+
+
+@swagger_auto_schema(method='GET', tags=['uploaded courses'])
+@permission_classes((IsAuthenticated,))
+@api_view(['GET'])
+def my_uploaded_course(request):
+    user = request.user
+    try:
+        uploaded_course = CourseModel.objects.filter(course_owner=user)
+    except CourseModel.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = CourseSerializer(uploaded_course, many=True)
         return Response(serializer.data)
 
 
