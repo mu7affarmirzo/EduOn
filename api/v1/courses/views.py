@@ -165,6 +165,19 @@ class CoursesListView(ListCreateAPIView):
     queryset = CourseModel.objects.all()
     serializer_class = CourseSerializer
 
+    @swagger_auto_schema(tags=['uploaded courses'], request_body=CourseSerializer)
+    def post(self, request, *args, **kwargs):
+        account = request.user
+        if not account.is_speaker:
+            return Response({"status": False, "message": "User is not speaker!"})
+
+        course = CourseModel(course_owner=account)
+        serializer = CourseSerializer(course, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CoursesDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
