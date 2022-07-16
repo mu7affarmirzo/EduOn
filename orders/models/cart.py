@@ -35,7 +35,7 @@ class CartModel(models.Model):
     is_referral = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.owner.get_username()}-{self.course.name}"
+        return f"{str(self.owner.get_username())}-{str(self.course.name)}"
 
     class Meta:
         unique_together = ('owner', 'course',)

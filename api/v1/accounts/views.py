@@ -146,6 +146,17 @@ def account_detail_view(request):
         return Response(serializer.data)
 
 
+@swagger_auto_schema(method="get", tags=["accounts"])
+@api_view(['GET', ])
+@permission_classes((IsAuthenticated,))
+def speaker_detail_view(request, pk):
+
+    if request.method == 'GET':
+        account = Account.objects.get(id=pk)
+        serializer = AccountSerializer(account)
+        return Response(serializer.data)
+
+
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=DeactivateAccountSerializer)
 @api_view(['POST', ])
 @permission_classes((IsAuthenticated,))

@@ -46,7 +46,8 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ["is_admin", "is_active", "is_staff", "is_superuser", "is_speaker"]
 
 
 class AccountPropertiesSerializers(serializers.ModelSerializer):
