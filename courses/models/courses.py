@@ -7,7 +7,7 @@ from accounts.models import Account
 from courses.models.categories import CategoriesModel, SubCategoriesModel
 
 
-RATING_CHOICES =(
+RATING_CHOICES = (
     (1, 1),
     (2, 2),
     (3, 3),
@@ -47,6 +47,27 @@ class CourseModel(models.Model):
         return self.name
 
 
+class ModuleModel(models.Model):
+    course = models.ForeignKey(CourseModel, related_name='module', blank=True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return str(f"{self.course.name} - {self.name}")
+
+
+class LessonsModel(models.Model):
+    module = models.ForeignKey(ModuleModel, related_name='lessons', blank=True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    video_lesson_url = models.URLField(max_length=255, null=True)
+    subtitle_url = models.URLField(max_length=255, null=True)
+    about = models.TextField(null=True)
+    resource_file = models.FileField(null=True)# TODO:
+    duration = models.DurationField(null=True)
+
+    def __str__(self):
+        return str(f"{self.module.name} - {self.name}")
+
+
 class FavCoursesModel(models.Model):
     course = models.ForeignKey(CourseModel, related_name='fav_course', blank=True, on_delete=models.CASCADE)
     user = models.ForeignKey(Account, related_name='fav_course', blank=True, on_delete=models.CASCADE)
@@ -80,26 +101,3 @@ class RatingCoursesModel(models.Model):
 
     class Meta:
         unique_together = ('course', 'user')
-
-
-class ModuleModel(models.Model):
-    course = models.ForeignKey(CourseModel, related_name='module', blank=True, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return str(f"{self.course.name} - {self.name}")
-
-
-class LessonsModel(models.Model):
-    module = models.ForeignKey(ModuleModel, related_name='lessons', blank=True, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    video_lesson_url = models.URLField(max_length=255, null=True)
-    subtitle_url = models.URLField(max_length=255, null=True)
-    about = models.TextField(null=True)
-    resource_file = models.FileField(null=True)# TODO:
-    duration = models.DurationField(null=True)
-
-    def __str__(self):
-        return str(f"{self.module.name} - {self.name}")
-
-

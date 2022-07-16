@@ -72,7 +72,6 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class FavCoursesSerializer(serializers.ModelSerializer):
-    course = CourseSerializer()
 
     class Meta:
         model = FavCoursesModel
