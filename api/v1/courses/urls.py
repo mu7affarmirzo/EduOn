@@ -20,7 +20,6 @@ urlpatterns = [
 
     path('enrolled-courses/', EnrolledCoursesView.as_view(), name='fav-course'),
     path('uploaded-courses/', my_uploaded_course, name='uploaded-course'),
-    # path('fav-courses-list', list_my_fav_courses, name='fav-course-list'),
 ]
 
 

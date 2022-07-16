@@ -4,11 +4,13 @@ from django.conf import settings
 from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.v1.orders.serializers import CartSerializer, CartSummarySerializer
+from api.v1.orders.service import get_cart_total_price, get_wallet, proceed_transfer
 from courses.models.courses import CourseModel
 from orders.models.cart import CartModel
 from wallet.models import WalletModel, TransferModel
@@ -74,6 +76,18 @@ class CartDetailView(APIView):
         course = self.get_object(pk)
         course.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@swagger_auto_schema(tags=['payment-proceed'], method="post")
+@api_view(["POST"])
+def proceed_payment(request):
+    account = request.user
+    wallet = get_wallet(account)
+    total_price = get_cart_total_price(account)
+
+    proceed_transfer(wallet)
+
+    return Response({"status": True, "message": f"{wallet}", "cart": f"{total_price}"})
 
 
 class ProceedOrder(APIView):
