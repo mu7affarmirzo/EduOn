@@ -30,8 +30,8 @@ class CartItemModel(models.Model):
 
 
 class CartModel(models.Model):
-    owner = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
-    course = models.ForeignKey(CourseModel, on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, null=False)
+    course = models.ForeignKey(CourseModel, on_delete=models.CASCADE, blank=False, null=False)
     is_referral = models.BooleanField(default=False)
 
     def __str__(self):
