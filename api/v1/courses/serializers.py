@@ -80,6 +80,16 @@ class FavCoursesSerializer(serializers.ModelSerializer):
         ]
 
 
+class FavCoursesListSerializer(serializers.ModelSerializer):
+    course = CourseSerializer()
+
+    class Meta:
+        model = FavCoursesModel
+        fields = [
+            'course',
+        ]
+
+
 class EnrolledCoursesSerializer(serializers.ModelSerializer):
     course = CourseSerializer()
 

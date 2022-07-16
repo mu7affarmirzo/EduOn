@@ -9,8 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.v1.courses.permissions import IsOwnerOrReadOnly
-from api.v1.courses.serializers import SubCategoriesSerializer, CategoriesSerializer, CourseSerializer, \
-    FavCoursesSerializer, CommentsSerializer, SubCategoryCoursesSerializer, EnrolledCoursesSerializer
+from api.v1.courses.serializers import *
 from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel
 from courses.models.categories import CategoriesModel, SubCategoriesModel
 from courses.models.comments import CommentsModel
@@ -184,12 +183,17 @@ def post_fav_course(request):
 def list_fav_course(request):
     user = request.user
     try:
-        fav_course = FavCoursesModel.objects.filter(user=user)
+        fav_course_values = FavCoursesModel.objects.filter(user=user).values()
     except FavCoursesModel.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    try:
+        courses = CourseModel.objects.filter(pk__in=[i['course_id'] for i in fav_course_values])
+    except CourseModel.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     if request.method == 'GET':
-        serializer = FavCoursesSerializer(fav_course, many=True)
+        serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
 
 
