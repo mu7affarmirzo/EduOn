@@ -33,7 +33,6 @@ class CartSummarySerializer(serializers.Serializer):
 
     def get_total(self, obj):
         sum = 0
-        print(len(obj['items']))
         for i in obj['items']:
             sum += i.course.price
         return sum
