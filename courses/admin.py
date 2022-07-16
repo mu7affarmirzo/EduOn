@@ -5,10 +5,20 @@ from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCourses
 from courses.models.categories import CategoriesModel, SubCategoriesModel
 from courses.models.comments import CommentsModel
 
-admin.site.register(CourseModel)
+# admin.site.register(CourseModel)
 admin.site.register(FavCoursesModel)
 admin.site.register(CategoriesModel)
 admin.site.register(SubCategoriesModel)
 admin.site.register(CommentsModel)
 admin.site.register(EnrolledCoursesModel)
 admin.site.register(RatingCoursesModel)
+
+
+@admin.register(CourseModel)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "subcategory",
+        "course_owner",
+        "price"
+    )
