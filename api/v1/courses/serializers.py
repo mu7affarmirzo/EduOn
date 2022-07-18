@@ -40,10 +40,13 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-
     course_owner = serializers.SerializerMethodField('get_username_from_author')
     enrolled_students = serializers.SerializerMethodField(read_only=True)
+    is_free = serializers.SerializerMethodField(read_only=True)
     course_rating = serializers.SerializerMethodField(read_only=True)
+
+    def get_is_free(self, obj):
+        return True if obj.price == 0 else False
 
     def get_enrolled_students(self, obj):
         return obj.enrolled_course.count()
@@ -65,9 +68,12 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_username_from_author(self, obj):
         try:
-            username = f"{obj.course_owner.f_name} {obj.course_owner.l_name}"
+            username = {
+                "id": obj.course_owner.id,
+                "full_name": f"{obj.course_owner.f_name} {obj.course_owner.l_name}"
+            }
         except:
-            username = obj.course_owner.phone_number
+            username = obj.course_owner.id
         return username
 
 

@@ -43,6 +43,10 @@ class CourseModel(models.Model):
     cover_img = models.ImageField(upload_to=upload_location, null=True, blank=True)
     trailer_url = models.URLField(max_length=255, null=True)
 
+    @property
+    def is_free(self):
+        return True if self.price == 0 else False
+
     def __str__(self):
         return self.name
 

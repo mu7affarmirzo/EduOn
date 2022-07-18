@@ -1,7 +1,10 @@
 from django.contrib import admin
 from wallet.models import WalletModel, TransferModel, VoucherModel, CardModel
 
-admin.site.register(WalletModel)
+
+@admin.register(WalletModel)
+class WalletAdmin(admin.ModelAdmin):
+    list_display = ('phone', 'card_number', 'expire')
 
 
 @admin.register(TransferModel)

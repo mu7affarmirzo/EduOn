@@ -15,7 +15,8 @@ urlpatterns = [
     path('list', account_list_view, name='list'),
     path('update', update_account_view, name='update'),
     path('become-speaker', become_speaker_view, name='become-speaker'),
-    path('change-password/<int:pk>', ChangePasswordView.as_view(), name='update'),
+    path('change-password', update_password_view, name='update-password'),
+    path('forgot-password', forgot_password_view, name='forgot-password'),
 
     path('device', DevicesListView.as_view(), name='devices'),
     path('device/<int:pk>', DevicesDetailView.as_view(), name='devices-detail'),

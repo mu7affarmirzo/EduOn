@@ -20,7 +20,7 @@ from accounts.models import Otp, DeviceModel
 from accounts.models.account import Account
 from api.v1.accounts.serializers import RegistrationSerializer, AccountSerializer, OtpSerializer, \
     AccountPropertiesSerializers, ChangePasswordSerializer, DevicesSerializer, DeactivateAccountSerializer, \
-    StepTwoSerializer, BecomeSpeakerSerializers
+    StepTwoSerializer, BecomeSpeakerSerializers, ForgotPasswordSerializer
 
 
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=OtpSerializer)
@@ -151,7 +151,7 @@ def account_detail_view(request):
 
 @swagger_auto_schema(method="get", tags=["accounts"])
 @api_view(['GET', ])
-@permission_classes((IsAuthenticated,))
+# @permission_classes((IsAuthenticated,))
 def speaker_detail_view(request, pk):
 
     if request.method == 'GET':
@@ -210,14 +210,7 @@ def become_speaker_view(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ChangePasswordView(UpdateAPIView):
-
-    queryset = Account.objects.all()
-    permission_classes = (IsAuthenticated,)
-    serializer_class = ChangePasswordSerializer
-
-
-@swagger_auto_schema(method="put", tags=["accounts"], request_body=AccountPropertiesSerializers)
+@swagger_auto_schema(method="put", tags=["accounts"], request_body=ChangePasswordSerializer)
 @api_view(['PUT', ])
 @permission_classes((IsAuthenticated,))
 def update_password_view(request):
@@ -233,6 +226,25 @@ def update_password_view(request):
             serializer.save()
             data['response'] = "Account password updated successfully"
             return Response(data=data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(method="put", tags=["accounts"], request_body=ForgotPasswordSerializer)
+@api_view(['PUT', ])
+@permission_classes((IsAuthenticated,))
+def forgot_password_view(request):
+    try:
+        account = request.user
+    except Account.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'PUT':
+        serializer = ForgotPasswordSerializer(account, data=request.data)
+        data = {}
+        if serializer.is_valid():
+            serializer.save()
+            data['response'] = "Account password updated successfully!"
+            return Response(data=data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
