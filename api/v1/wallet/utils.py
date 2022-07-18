@@ -86,7 +86,8 @@ def withdraw_from_wallet_service(wallet, data):
         return Response(status.HTTP_404_NOT_FOUND)
 
     if resp_data.json()['status']:
-        TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
+        data = resp_data.json()
+        TransferModel.objects.create(wallet=wallet, tr_id=data['result']['tr_id'], amount=data['amount'], type=True)
         return Response(data.json())
     else:
         token = login_to()
@@ -96,7 +97,7 @@ def withdraw_from_wallet_service(wallet, data):
             return Response({'message': 'Service is not working.'})
 
         try:
-            TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
+            TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'], amount=data['amount'], type=True)
         except:
             resp_data.json()['transfer_status'] = "false"
         return Response(resp_data.json())
@@ -126,7 +127,7 @@ def transfer_service(wallet, data):
             except:
                 return Response({'message': 'Service is not working.'})
             try:
-                TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'])
+                TransferModel.objects.create(wallet=wallet, tr_id=resp_data.json()['result']['tr_id'], amount=data['amount'], type=True)
             except:
                 resp_data.json()['transfer_status'] = "false"
         return Response(resp_data.json())

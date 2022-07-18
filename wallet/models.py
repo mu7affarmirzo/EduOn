@@ -21,6 +21,8 @@ class WalletModel(models.Model):
 
 class TransferModel(models.Model):
     wallet = models.ForeignKey(WalletModel, on_delete=models.SET_NULL, null=True)
+    amount = models.CharField(max_length=255, null=True, blank=True)
+    type = models.BooleanField(default=False, null=True, blank=True)
     tr_id = models.CharField(max_length=255, blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
 

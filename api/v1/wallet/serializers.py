@@ -1,6 +1,6 @@
 from rest_framework import serializers
 # from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
-from wallet.models import CardModel, VoucherModel
+from wallet.models import CardModel, VoucherModel, TransferModel
 
 
 class TransferSerializer(serializers.Serializer):
@@ -54,7 +54,7 @@ class CardSerializer(serializers.ModelSerializer):
         return card_number
 
 
-class VoucherSerializer(serializers.ModelSerializer):
+class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VoucherModel
+        model = TransferModel
         fields = '__all__'
