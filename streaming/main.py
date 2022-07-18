@@ -11,6 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from videoprops import get_video_properties
 
 import shutil
+import nest_asyncio
+nest_asyncio.apply()
 
 app = FastAPI()
 
@@ -40,136 +42,16 @@ async def upload(request: Request):
     return templates.TemplateResponse("upload.html", {"request": request})
 
 
-async def segment(input_file: str, path: str):
+async def segment(media_id: int, base_url: str, input_file: str, path: str):
+    media_dict = {}
     props = get_video_properties(input_file)
 
-    if int(props['width']) >= 3840 and int(props['height']) >= 2160:
-        path = "{}/2160p".format(path)
-        is_exist = os.path.exists(path)
-        if not is_exist:
-            os.makedirs(path)
-        await asyncio.create_subprocess_exec(
-
-            "ffmpeg",
-            "-i", input_file,
-            "-profile:v", "baseline",
-            "-level", "3.0",
-            "-s", "3840x2160",
-            "-start_number", "0",
-            "-hls_time", "10",
-            "-hls_list_size", "0",
-            "-f", "hls", "{}/index.m3u8".format(path),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-
-    if int(props['width']) >= 2560 and int(props['height']) >= 1440:
-        path = "{}/1440p".format(path)
-        is_exist = os.path.exists(path)
-        if not is_exist:
-            os.makedirs(path)
-        await asyncio.create_subprocess_exec(
-
-            "ffmpeg",
-            "-i", input_file,
-            "-profile:v", "baseline",
-            "-level", "3.0",
-            "-s", "2560x1440",
-            "-start_number", "0",
-            "-hls_time", "10",
-            "-hls_list_size", "0",
-            "-f", "hls", "{}/index.m3u8".format(path),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-
-    if int(props['width']) >= 1920 and int(props['height']) >= 1080:
-        path = "{}/1080p".format(path)
-        is_exist = os.path.exists(path)
-        if not is_exist:
-            os.makedirs(path)
-        await asyncio.create_subprocess_exec(
-
-            "ffmpeg",
-            "-i", input_file,
-            "-profile:v", "baseline",
-            "-level", "3.0",
-            "-s", "1920x1080",
-            "-start_number", "0",
-            "-hls_time", "10",
-            "-hls_list_size", "0",
-            "-f", "hls", "{}/index.m3u8".format(path),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-
-    if int(props['width']) >= 1280 and int(props['height']) >= 720:
-        path = "{}/720p".format(path)
-        is_exist = os.path.exists(path)
-        if not is_exist:
-            os.makedirs(path)
-        await asyncio.create_subprocess_exec(
-
-            "ffmpeg",
-            "-i", input_file,
-            "-profile:v", "baseline",
-            "-level", "3.0",
-            "-s", "1280x720",
-            "-start_number", "0",
-            "-hls_time", "10",
-            "-hls_list_size", "0",
-            "-f", "hls", "{}/index.m3u8".format(path),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-
-    if int(props['width']) >= 854 and int(props['height']) >= 480:
-        path = "{}/480p".format(path)
-        is_exist = os.path.exists(path)
-        if not is_exist:
-            os.makedirs(path)
-        await asyncio.create_subprocess_exec(
-
-            "ffmpeg",
-            "-i", input_file,
-            "-profile:v", "baseline",
-            "-level", "3.0",
-            "-s", "854x480",
-            "-start_number", "0",
-            "-hls_time", "10",
-            "-hls_list_size", "0",
-            "-f", "hls", "{}/index.m3u8".format(path),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-
-    if int(props['width']) >= 640 and int(props['height']) >= 360:
-        path = "{}/360p".format(path)
-        is_exist = os.path.exists(path)
-        if not is_exist:
-            os.makedirs(path)
-        await asyncio.create_subprocess_exec(
-
-            "ffmpeg",
-            "-i", input_file,
-            "-profile:v", "baseline",
-            "-level", "3.0",
-            "-s", "640x360",
-            "-start_number", "0",
-            "-hls_time", "10",
-            "-hls_list_size", "0",
-            "-f", "hls", "{}/index.m3u8".format(path),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-
     if int(props['width']) >= 426 and int(props['height']) >= 240:
-        path = "{}/240p".format(path)
-        is_exist = os.path.exists(path)
+        media_path = "{}/240p".format(path)
+        is_exist = os.path.exists(media_path)
         if not is_exist:
-            os.makedirs(path)
-        await asyncio.create_subprocess_exec(
-
+            os.makedirs(media_path)
+        proc = await asyncio.create_subprocess_exec(
             "ffmpeg",
             "-i", input_file,
             "-profile:v", "baseline",
@@ -178,14 +60,146 @@ async def segment(input_file: str, path: str):
             "-start_number", "0",
             "-hls_time", "10",
             "-hls_list_size", "0",
-            "-f", "hls", "{}/index.m3u8".format(path),
+            "-f", "hls", "{}/index.m3u8".format(media_path),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
+        await proc.wait()
+        media_dict['240p'] = f"{base_url}media/{media_id}/240p/stream"
+
+    if int(props['width']) >= 640 and int(props['height']) >= 360:
+        media_path = "{}/360p".format(path)
+        is_exist = os.path.exists(media_path)
+        if not is_exist:
+            os.makedirs(media_path)
+        proc = await asyncio.create_subprocess_exec(
+            "ffmpeg",
+            "-i", input_file,
+            "-profile:v", "baseline",
+            "-level", "3.0",
+            "-s", "640x360",
+            "-start_number", "0",
+            "-hls_time", "10",
+            "-hls_list_size", "0",
+            "-f", "hls", "{}/index.m3u8".format(media_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        await proc.wait()
+        media_dict['360p'] = f"{base_url}media/{media_id}/360p/stream"
+
+    if int(props['width']) >= 854 and int(props['height']) >= 480:
+        media_path = "{}/480p".format(path)
+        is_exist = os.path.exists(media_path)
+        if not is_exist:
+            os.makedirs(media_path)
+        proc = await asyncio.create_subprocess_exec(
+            "ffmpeg",
+            "-i", input_file,
+            "-profile:v", "baseline",
+            "-level", "3.0",
+            "-s", "854x480",
+            "-start_number", "0",
+            "-hls_time", "10",
+            "-hls_list_size", "0",
+            "-f", "hls", "{}/index.m3u8".format(media_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        await proc.wait()
+        media_dict['480p'] = f"{base_url}media/{media_id}/480p/stream"
+
+    if int(props['width']) >= 1280 and int(props['height']) >= 720:
+        media_path = "{}/720p".format(path)
+        is_exist = os.path.exists(media_path)
+        if not is_exist:
+            os.makedirs(media_path)
+        proc = await asyncio.create_subprocess_exec(
+            "ffmpeg",
+            "-i", input_file,
+            "-profile:v", "baseline",
+            "-level", "3.0",
+            "-s", "1280x720",
+            "-start_number", "0",
+            "-hls_time", "10",
+            "-hls_list_size", "0",
+            "-f", "hls", "{}/index.m3u8".format(media_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        await proc.wait()
+        media_dict['720p'] = f"{base_url}media/{media_id}/720p/stream"
+
+    if int(props['width']) >= 1920 and int(props['height']) >= 1080:
+        media_path = "{}/1080p".format(path)
+        is_exist = os.path.exists(media_path)
+        if not is_exist:
+            os.makedirs(media_path)
+        proc = await asyncio.create_subprocess_exec(
+            "ffmpeg",
+            "-i", input_file,
+            "-profile:v", "baseline",
+            "-level", "3.0",
+            "-s", "1920x1080",
+            "-start_number", "0",
+            "-hls_time", "10",
+            "-hls_list_size", "0",
+            "-f", "hls", "{}/index.m3u8".format(media_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        await proc.wait()
+        media_dict['1080p'] = f"{base_url}media/{media_id}/1080p/stream"
+
+    if int(props['width']) >= 2560 and int(props['height']) >= 1440:
+        media_path = "{}/1440p".format(path)
+        is_exist = os.path.exists(media_path)
+        if not is_exist:
+            os.makedirs(media_path)
+        proc = await asyncio.create_subprocess_exec(
+            "ffmpeg",
+            "-i", input_file,
+            "-profile:v", "baseline",
+            "-level", "3.0",
+            "-s", "2560x1440",
+            "-start_number", "0",
+            "-hls_time", "10",
+            "-hls_list_size", "0",
+            "-f", "hls", "{}/index.m3u8".format(media_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        await proc.wait()
+        media_dict['1440p'] = f"{base_url}media/{media_id}/1440p/stream"
+
+
+    if int(props['width']) >= 3840 and int(props['height']) >= 2160:
+        media_path = "{}/2160p".format(path)
+        is_exist = os.path.exists(media_path)
+        if not is_exist:
+            os.makedirs(media_path)
+        proc = await asyncio.create_subprocess_exec(
+            "ffmpeg",
+            "-i", input_file,
+            "-profile:v", "baseline",
+            "-level", "3.0",
+            "-s", "3840x2160",
+            "-start_number", "0",
+            "-hls_time", "10",
+            "-hls_list_size", "0",
+            "-f", "hls", "{}/index.m3u8".format(media_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        await proc.wait()
+        media_dict['2160p'] = f"{base_url}media/{media_id}/2160p/stream"
+
+    return media_dict
 
 
 @app.post("/media/{media_id}/upload")
 async def upload(
+        request: Request,
         media_id: int,
         video: UploadFile = File(
             ...,
@@ -209,8 +223,8 @@ async def upload(
 
     f = open(file_location, mode='wb+')
     f.write(video.file.read())
-    await segment(file_location, path)
-    return {"message": "uploaded successfully"}
+    media_dict = asyncio.run(segment(media_id, request.base_url, file_location, path))
+    return {"urls": media_dict}
 
 
 @app.delete("/media/{media_id}/delete")

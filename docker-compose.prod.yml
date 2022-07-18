@@ -17,12 +17,16 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - app-media:/app/media
       - app-static:/app/static
+      - app-media_cdn:/app/media_cdn
+      - app-static_cdn:/app/static_cdn
 
   app:
     restart: unless-stopped
     volumes:
       - app-media:/app/media
       - app-static:/app/static
+      - app-media_cdn:/app/media_cdn
+      - app-static_cdn:/app/static_cdn
 
   stream:
     restart: unless-stopped
@@ -45,5 +49,7 @@ services:
 volumes:
   app-media:
   app-static:
+  app-media_cdn:
+  app-static_cdn:
   stream-media:
   stream-static:

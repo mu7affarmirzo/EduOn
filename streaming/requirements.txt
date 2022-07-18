@@ -3,3 +3,4 @@ get-video-properties
 python-multipart
 Jinja2
 uvicorn
+nest_asyncio

@@ -37,6 +37,14 @@ server {
         alias /app/media/;
       }
 
+      location /static_cdn/ {
+        alias /app/static_cdn/;
+      }
+
+      location /media_cdn/ {
+        alias /app/media_cdn/;
+      }
+
       location / {
         allow all;
         proxy_http_version 1.1;
