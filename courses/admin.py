@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 # Register your models here.
-from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel, RatingCoursesModel
+from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel, RatingCoursesModel, ModuleModel, \
+    LessonsModel
 from courses.models.categories import CategoriesModel, SubCategoriesModel
 from courses.models.comments import CommentsModel
 
@@ -21,3 +22,13 @@ class CourseAdmin(admin.ModelAdmin):
         "course_owner",
         "price"
     )
+
+
+@admin.register(ModuleModel)
+class ModuleAdmin(admin.ModelAdmin):
+    list_display = ("name", "course")
+
+
+@admin.register(LessonsModel)
+class LessonsAdmin(admin.ModelAdmin):
+    list_display = ("name", "module")

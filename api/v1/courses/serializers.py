@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from courses.models.categories import CategoriesModel, SubCategoriesModel
-from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel
+from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel, ModuleModel, LessonsModel
 from courses.models.comments import CommentsModel
 
 
@@ -75,6 +75,28 @@ class CourseSerializer(serializers.ModelSerializer):
         except:
             username = obj.course_owner.id
         return username
+
+
+class LessonsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LessonsModel
+        fields = '__all__'
+
+
+class ModulesListSerializer(serializers.ModelSerializer):
+    lessons = LessonsSerializer(many=True)
+
+    class Meta:
+        model = ModuleModel
+        fields = '__all__'
+
+
+class ModulesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ModuleModel
+        fields = '__all__'
 
 
 class FavCoursesSerializer(serializers.ModelSerializer):
