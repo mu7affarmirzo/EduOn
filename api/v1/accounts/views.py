@@ -51,12 +51,12 @@ def step_one(request):
 
         serializer_data = {
             'mobile': request_data['mobile'],
-            'otp': enc_otp,
-            # 'lang': request_data['lang']
+            'otp': sms_code,
+            'enc_otp': enc_otp,
         }
 
-        otp_code = Otp()
-        serializer = OtpSerializer(otp_code, serializer_data)
+        otp_code = Otp(mobile=request_data['mobile'])
+        serializer = OtpSerializer(otp_code, data=serializer_data)
         data = {}
 
         if serializer.is_valid():
@@ -66,7 +66,7 @@ def step_one(request):
                 'otp_generated': enc_otp,
                 'sms_service_response': r.json(),
             }
-            return Response(data=data)
+            return Response(data=data, status=status.HTTP_201_CREATED)
 
         return Response(r.json())
 
@@ -78,11 +78,14 @@ def step_two(request):
         data = request.data
         context = {}
         try:
-            mobile_user = Otp.objects.get(otp=data['otp_token'])
+            mobile_user = Otp.objects.get(enc_otp=data['otp_token'])
         except:
-            return Response({'status': False, 'message': 'This token has not been found'})
+            return Response({'status': False, 'message': 'This token has not been found.'})
 
-        if pbkdf2_sha256.verify(data['otp'], mobile_user.otp):
+        if not mobile_user.is_active:
+            return Response({'status': False, 'message': 'This token has been expired!'})
+
+        if pbkdf2_sha256.verify(data['otp'], mobile_user.enc_otp):
             try:
                 user = Account.objects.get(phone_number=mobile_user.mobile)
             except:
@@ -97,9 +100,9 @@ def step_two(request):
             }
             return Response(context)
         else:
-            return Response({'status': False, 'message': 'The code is not correct'})
+            return Response({'status': False, 'message': 'The code is not correct'}, status=status.HTTP_404_NOT_FOUND)
 
-    return Response({'status': True, 'message': 'Code verified!'})
+    return Response({'status': True, 'message': 'Code verified!'}, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=RegistrationSerializer)

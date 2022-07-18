@@ -12,14 +12,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['email',
-                  'phone_number',
-                  'password',
-                  'password2',
-                  'f_name',
-                  'l_name',
-                  'sex'
-                  ]
+        fields = [
+            'email',
+            'phone_number',
+            'password',
+            'password2',
+            'f_name',
+            'l_name',
+            'sex'
+        ]
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -46,8 +47,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        # fields = "__all__"
-        exclude = ["is_admin", "is_active", "is_staff", "is_superuser", "is_speaker"]
+        exclude = ["is_admin", "is_staff", "is_superuser"]
 
 
 class AccountPropertiesSerializers(serializers.ModelSerializer):

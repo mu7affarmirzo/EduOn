@@ -1,10 +1,9 @@
 from django.http import Http404
-from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -80,47 +79,58 @@ class CommentsOptionsView(APIView):
 
 
 class SubCategoriesListView(ListAPIView):
-    # permission_classes = [IsAuthenticated]
+    queryset = SubCategoriesModel.objects.all()
+    serializer_class = SubCategoryCoursesSerializer
+
+    @swagger_auto_schema(tags=['categories'])
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class SubCategoriesDetailView(RetrieveAPIView):
     swagger_auto_schema(request_body=SubCategoriesSerializer, tags=['SubCategories'])
     queryset = SubCategoriesModel.objects.all()
     serializer_class = SubCategoryCoursesSerializer
 
-    # def get(self, request, *args, **kwargs):
-    #     return Response({'message': "no photo no video"})
-
-
-class SubCategoriesDetailView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    swagger_auto_schema(request_body=SubCategoriesSerializer, tags=['SubCategories'])
-    queryset = SubCategoriesModel.objects.all()
-    serializer_class = SubCategoryCoursesSerializer
+    @swagger_auto_schema(tags=['categories'])
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
 
 class CategoriesListView(ListAPIView):
-    # permission_classes = [IsAuthenticated]
-    swagger_auto_schema(request_body=CategoriesSerializer, tags=['Categories'])
     queryset = CategoriesModel.objects.all()
     serializer_class = CategoriesSerializer
 
+    @swagger_auto_schema(tags=['categories'])
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-class CategoriesDetailView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    swagger_auto_schema(request_body=CategoriesSerializer, tags=['Categories'])
+
+class CategoriesDetailView(RetrieveAPIView):
     queryset = CategoriesModel.objects.all()
     serializer_class = CategoriesSerializer
+
+    @swagger_auto_schema(tags=['categories'])
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
 
 class CoursesListView(ListCreateAPIView):
-    # permission_classes = [IsAuthenticated]
-    swagger_auto_schema(request_body=CourseSerializer, tags=['Courses'])
     queryset = CourseModel.objects.all()
     serializer_class = CourseSerializer
+
+    def get_permissions(self):
+        method = self.request.method
+        if method == 'POST':
+            return [IsAuthenticated()]
+        else:
+            return [AllowAny()]
 
     @swagger_auto_schema(tags=['uploaded courses'], request_body=CourseSerializer)
     def post(self, request, *args, **kwargs):
         account = request.user
         if not account.is_speaker:
-            return Response({"status": False, "message": "User is not speaker!"})
+            return Response({"status": False, "message": "User is not speaker!"}, status=status.HTTP_400_BAD_REQUEST)
 
         course = CourseModel(course_owner=account)
         serializer = CourseSerializer(course, data=request.data)
@@ -131,10 +141,16 @@ class CoursesListView(ListCreateAPIView):
 
 
 class CoursesDetailView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
     swagger_auto_schema(request_body=CourseSerializer, tags=['Courses'])
     queryset = CourseModel.objects.all()
     serializer_class = CourseSerializer
+
+    def get_permissions(self):
+        method = self.request.method
+        if method == 'PATCH' or method == 'DELETE' or method == 'PUT':
+            return [IsAuthenticated(), IsOwnerOrReadOnly]
+        else:
+            return [AllowAny()]
 
 
 class EnrolledCoursesView(APIView):
