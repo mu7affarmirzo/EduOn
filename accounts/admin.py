@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.admin import register
+
 from accounts.models.account import Account
 from accounts.models.card import CreditCardModel
 from accounts.models.country import *
@@ -22,4 +24,8 @@ admin.site.register(ProvinceModel, CountryAdmin)
 admin.site.register(DistrictModel, CountryAdmin)
 
 admin.site.register(CodeModel)
-admin.site.register(Otp)
+
+
+@register(Otp)
+class OtpAdmin(admin.ModelAdmin):
+    list_display = ('mobile', 'otp', 'created_at', 'is_active')

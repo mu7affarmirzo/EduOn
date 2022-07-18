@@ -12,7 +12,6 @@ urlpatterns = [
 
     path('comments/', post_comment, name='comments'),
     path('comments/<int:pk>', CommentsOptionsView.as_view(), name='course-comments'),
-    # path('comments/<int:pk>', CommentsDetailView.as_view(), name='comments-detail'),
 
     path('fav-courses/', post_fav_course, name='fav-course'),
     path('list-fav-courses/', list_fav_course, name='list-fav-course'),

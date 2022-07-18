@@ -106,6 +106,8 @@ class SubCategoryCoursesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCategoriesModel
         fields = [
+            'id',
+            'name',
             'courses',
         ]
 
