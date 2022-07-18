@@ -11,8 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.v1.wallet.serializers import TransferSerializer, CardSerializer, WalletHistorySerializer, VoucherSerializer, \
-    CardAddSerializer
+from api.v1.wallet.serializers import *
 from api.v1.wallet.utils import login_to, withdraw_from_wallet_service, transfer_service
 from django.conf import settings
 from wallet.models import WalletModel, TransferModel, CardModel, VoucherModel
@@ -22,6 +21,17 @@ from wallet.models import WalletModel, TransferModel, CardModel, VoucherModel
 EDUON_WALLET = config('EDUON_WALLET')
 WALLET_URL = config('WALLET_URL')
 HEADER = {"token": f"{settings.WALLET_TOKEN}"}
+
+
+@permission_classes((IsAuthenticated, ))
+@swagger_auto_schema(method="get", tags=["wallet"])
+@api_view(['GET'])
+def transactions_history_view(request):
+    account = request.user
+    transactions = TransferModel.objects.filter(wallet=account.wallet)
+    serializer = TransactionSerializer(transactions, many=True)
+
+    return Response(serializer.data)
 
 
 @permission_classes((IsAuthenticated, ))

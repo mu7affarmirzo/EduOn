@@ -6,8 +6,12 @@ app_name = 'courses'
 urlpatterns = [
     path('', CoursesListView.as_view(), name='courses'),
     path('<int:pk>', CoursesDetailView.as_view(), name='courses-detail'),
+
     path('module/<int:pk>', ModuleListView.as_view(), name='courses-modules-detail'),
     path('module/', modules_post_view, name='courses-modules'),
+
+    path('lesson/<int:pk>', LessonsListView.as_view(), name='courses-lesson-detail'),
+    path('lesson/', lesson_post_view, name='courses-lesson'),
 
 
 

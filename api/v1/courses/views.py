@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -77,7 +78,7 @@ class CommentsOptionsView(APIView):
         course_owner = comment.course.course_owner.id
         user = request.user
 
-        if comment.author.id != user.id and course_owner != user.id:
+        if comment.author.id != user.id or course_owner != user.id:
             return Response({'response': "You don't have the permission to delete that."})
         comment = self.get_object(pk)
         comment.delete()
@@ -163,9 +164,17 @@ class ModuleListView(APIView):
     queryset = ModuleModel.objects.all()
 
     @swagger_auto_schema(tags=['course-modules'])
-    def get(self, request, pk, format=None):
+    def get(self, request, pk):
         snippets = ModuleModel.objects.filter(course_id=pk)
         serializer = ModulesListSerializer(snippets, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(tags=['course-modules'], request_body=ModulesSerializer)
+    def put(self, request, pk, format=None):
+        module = get_object_or_404(ModuleModel, pk=pk)
+        serializer = ModulesSerializer(module, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
         return Response(serializer.data)
 
 
@@ -186,6 +195,44 @@ def modules_post_view(request):
 
         if course.course_owner != account:
             return Response({"status": False, "message": "This user is not the owner of the course."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LessonsListView(APIView):
+    queryset = LessonsModel.objects.all()
+    permission_classes = [IsAuthenticated, ]
+
+    @swagger_auto_schema(tags=['course-modules'], request_body=LessonsSerializer)
+    def put(self, request, pk, format=None):
+        lesson = get_object_or_404(LessonsModel, pk=pk)
+        serializer = LessonsSerializer(lesson, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
+
+
+@swagger_auto_schema(tags=['course-modules'], method='post', request_body=LessonsSerializer)
+@permission_classes((IsAuthenticated,))
+@api_view(['POST'])
+def lesson_post_view(request):
+    account = request.user
+    if not account.is_speaker:
+        return Response({"status": False, "message": "User is not speaker!"}, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = LessonsSerializer(data=request.data)
+    if serializer.is_valid():
+        try:
+            module = ModuleModel.objects.get(id=serializer.validated_data['module'].id)
+        except CourseModel.DoesNotExist:
+            raise Http404
+
+        if module.course.course_owner != account:
+            return Response({"status": False, "message": "This user is not the owner of the course."}, status=status.HTTP_404_NOT_FOUND)
+
+        # TODO: restrict video update
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
