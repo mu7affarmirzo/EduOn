@@ -15,6 +15,12 @@ RATING_CHOICES = (
     (5, 5),
 )
 
+VALIDITY_CHOICES = (
+    ('ON HOLD', "ON HOLD"),
+    ('NOT VALID', 'NOT VALID'),
+    ('VALID', 'VALID'),
+)
+
 
 def upload_location(instance, filename):
     ext = filename.split('.')[-1]
@@ -42,6 +48,8 @@ class CourseModel(models.Model):
     discount_price = models.FloatField(default=0, null=True)
     cover_img = models.ImageField(upload_to=upload_location, null=True, blank=True)
     trailer_url = models.URLField(max_length=255, null=True)
+
+    is_valid = models.CharField(max_length=25, choices=VALIDITY_CHOICES, null=True)
 
     @property
     def is_free(self):

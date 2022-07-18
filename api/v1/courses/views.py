@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from api.v1.courses.permissions import IsOwnerOrReadOnly
 from api.v1.courses.serializers import *
-from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel
+from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel, ModuleModel
 from courses.models.categories import CategoriesModel, SubCategoriesModel
 from courses.models.comments import CommentsModel
 
@@ -28,7 +28,13 @@ def post_comment(request, format=None):
 
 
 class CommentsOptionsView(APIView):
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        method = self.request.method
+        if method == 'GET':
+            return [AllowAny()]
+        else:
+            return [IsAuthenticated()]
 
     def get_object(self, pk):
         try:
@@ -151,6 +157,39 @@ class CoursesDetailView(RetrieveUpdateDestroyAPIView):
             return [IsAuthenticated(), IsOwnerOrReadOnly]
         else:
             return [AllowAny()]
+
+
+class ModuleListView(APIView):
+    queryset = ModuleModel.objects.all()
+
+    @swagger_auto_schema(tags=['course-modules'])
+    def get(self, request, pk, format=None):
+        snippets = ModuleModel.objects.filter(course_id=pk)
+        serializer = ModulesListSerializer(snippets, many=True)
+        return Response(serializer.data)
+
+
+@swagger_auto_schema(tags=['course-modules'], method='post', request_body=ModulesSerializer)
+@permission_classes((IsAuthenticated,))
+@api_view(['POST'])
+def modules_post_view(request):
+    account = request.user
+    if not account.is_speaker:
+        return Response({"status": False, "message": "User is not speaker!"}, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = ModulesSerializer(data=request.data)
+    if serializer.is_valid():
+        try:
+            course = CourseModel.objects.get(id=serializer.validated_data['course'].id)
+        except CourseModel.DoesNotExist:
+            raise Http404
+
+        if course.course_owner != account:
+            return Response({"status": False, "message": "This user is not the owner of the course."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EnrolledCoursesView(APIView):

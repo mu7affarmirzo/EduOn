@@ -2,9 +2,15 @@ from django.urls import path, include
 from api.v1.courses.views import *
 
 app_name = 'courses'
+
 urlpatterns = [
     path('', CoursesListView.as_view(), name='courses'),
     path('<int:pk>', CoursesDetailView.as_view(), name='courses-detail'),
+    path('module/<int:pk>', ModuleListView.as_view(), name='courses-modules-detail'),
+    path('module/', modules_post_view, name='courses-modules'),
+
+
+
     path('subcategories/', SubCategoriesListView.as_view(), name='sub-categories'),
     path('subcategories/<int:pk>', SubCategoriesDetailView.as_view(), name='sub-categories-detail'),
     path('categories/', CategoriesListView.as_view(), name='categories'),
@@ -20,5 +26,4 @@ urlpatterns = [
     path('enrolled-courses/', EnrolledCoursesView.as_view(), name='fav-course'),
     path('uploaded-courses/', my_uploaded_course, name='uploaded-course'),
 ]
-
 
