@@ -24,13 +24,12 @@ WALLET_URL = config('WALLET_URL')
 HEADER = {"token": f"{settings.WALLET_TOKEN}"}
 
 
-@permission_classes([IsAuthenticated])
+@permission_classes((IsAuthenticated, ))
 @swagger_auto_schema(method="get", tags=["wallet"])
 @api_view(['GET'])
 def info_wallet(request):
 
 
-    print(f"*******************************{request.user}")
     if str(request.user) == "AnonymousUser":
         return Response(status=status.HTTP_403_FORBIDDEN)
     try:

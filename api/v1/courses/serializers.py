@@ -68,9 +68,12 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_username_from_author(self, obj):
         try:
-            username = f"{obj.course_owner.f_name} {obj.course_owner.l_name}"
+            username = {
+                "id": obj.course_owner.id,
+                "full_name": f"{obj.course_owner.f_name} {obj.course_owner.l_name}"
+            }
         except:
-            username = obj.course_owner.phone_number
+            username = obj.course_owner.id
         return username
 
 

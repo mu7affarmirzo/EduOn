@@ -113,6 +113,7 @@ def transfer_service(wallet, data):
             "amount": f"{data['amount']}",
         }
     }
+
     try:
         resp_data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{settings.WALLET_TOKEN}"})
         if resp_data.json()['status']:

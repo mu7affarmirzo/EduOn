@@ -85,7 +85,7 @@ def proceed_payment(request):
     wallet = get_wallet(account)
     total_price = get_cart_total_price(account)
 
-    proceed_transfer(wallet)
+    proceed_transfer(wallet, total_price)
 
     return Response({"status": True, "message": f"{wallet}", "cart_total_price": f"{total_price}"})
 
