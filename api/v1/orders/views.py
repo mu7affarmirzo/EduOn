@@ -87,7 +87,7 @@ def proceed_payment(request):
 
     proceed_transfer(wallet)
 
-    return Response({"status": True, "message": f"{wallet}", "cart": f"{total_price}"})
+    return Response({"status": True, "message": f"{wallet}", "cart_total_price": f"{total_price}"})
 
 
 class ProceedOrder(APIView):
