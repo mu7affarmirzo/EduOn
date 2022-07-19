@@ -11,7 +11,8 @@ class CommentsModel(models.Model):
     course = models.ForeignKey(CourseModel, related_name="comments", on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.author.id}-{self.course.id}-{self.date_created.date()}"
+        return str(self.text)
+        # return f"{self.author.id}-{self.course.id}-{self.date_created.date()}"
 
     class Meta:
         ordering = ('-date_created',)
