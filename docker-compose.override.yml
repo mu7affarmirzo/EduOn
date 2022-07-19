@@ -23,12 +23,16 @@ services:
       - ./docker/nginx/letsencrypt/privkey.pem:/etc/letsencrypt/live/${PRODUCTION_HOST}/privkey.pem
       - ./media:/app/media:ro
       - ./static:/app/static:ro
+      - ./media_cdn:/app/media_cdn:ro
+      - ./static_cdn:/app/static_cdn:ro
 
   app:
     volumes:
       - .:/app
       - ./media:/app/media
       - ./static:/app/static
+      - ./media_cdn:/app/media_cdn
+      - ./static_cdn:/app/static_cdn
     command: python ./manage.py runserver 0.0.0.0:8000
 
   stream:
@@ -43,12 +47,16 @@ services:
       - .:/app
       - ./media:/app/media
       - ./static:/app/static
+      - ./media_cdn:/app/media_cdn
+      - ./static_cdn:/app/static_cdn
 
   celery-beat:
     volumes:
       - .:/app
       - ./media:/app/media
       - ./static:/app/static
+      - ./media_cdn:/app/media_cdn
+      - ./static_cdn:/app/static_cdn
 
 volumes:
   eduon_db:
