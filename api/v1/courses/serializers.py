@@ -6,7 +6,8 @@ from courses.models.comments import CommentsModel
 
 
 class CommentsSerializer(serializers.ModelSerializer):
-    username = serializers.SerializerMethodField('get_username_from_author')
+    user = serializers.SerializerMethodField('get_username_from_author')
+    phone = serializers.SerializerMethodField('get_phone_from_author')
 
     class Meta:
         model = CommentsModel
@@ -14,17 +15,22 @@ class CommentsSerializer(serializers.ModelSerializer):
             'id',
             'text',
             'date_created',
-            'username',
+            'user',
+            'phone',
             'course'
         ]
 
+    def get_phone_from_author(self, comment):
+        phone_number = comment.author.phone_number
+        return phone_number
+
     def get_username_from_author(self, comment):
-        username = comment.author.phone_number
-        return username
+        username = f"{comment.author.f_name} {comment.author.l_name}"
+        profile_picture = comment.author.profile_picture.url
+        return {"full_name": username, "picture": str(profile_picture)}
 
 
 class SubCategoriesSerializer(serializers.ModelSerializer):
-    # courses = CourseSerializer(many=True)
 
     class Meta:
         model = SubCategoriesModel
@@ -138,6 +144,7 @@ class SubCategoryCoursesSerializer(serializers.ModelSerializer):
             'name',
             'courses',
         ]
+
 
 
 

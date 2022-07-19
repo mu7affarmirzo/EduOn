@@ -1,15 +1,13 @@
 import random
 
 import requests
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from passlib.handlers.pbkdf2 import pbkdf2_sha256
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, action, permission_classes
-from rest_framework.generics import GenericAPIView, UpdateAPIView
-from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
 from urllib.error import HTTPError
 
 from rest_framework.views import APIView
@@ -18,9 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import Otp, DeviceModel
 from accounts.models.account import Account
-from api.v1.accounts.serializers import RegistrationSerializer, AccountSerializer, OtpSerializer, \
-    AccountPropertiesSerializers, ChangePasswordSerializer, DevicesSerializer, DeactivateAccountSerializer, \
-    StepTwoSerializer, BecomeSpeakerSerializers, ForgotPasswordSerializer
+from api.v1.accounts.serializers import *
 
 
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=OtpSerializer)
@@ -151,7 +147,6 @@ def account_detail_view(request):
 
 @swagger_auto_schema(method="get", tags=["accounts"])
 @api_view(['GET', ])
-# @permission_classes((IsAuthenticated,))
 def speaker_detail_view(request, pk):
 
     if request.method == 'GET':
@@ -316,3 +311,13 @@ class DevicesDetailView(APIView):
         device = self.get_object(pk)
         device.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+###
+@swagger_auto_schema(method="get", tags=["accounts"])
+@api_view(['GET', ])
+def speakers_list_view(request):
+    if request.method == 'GET':
+        speakers = Account.objects.filter(is_speaker=True)
+        serializer = SpeakerSerializer(speakers, many=True)
+        return Response(serializer.data)

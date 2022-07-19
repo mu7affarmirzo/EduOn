@@ -23,5 +23,6 @@ urlpatterns = [
 
     path('profile', account_detail_view, name='my-profile'),
     path('speaker-profile/<int:pk>', speaker_detail_view, name='speaker-profile'),
+    path('speakers-list/', speakers_list_view, name='speakers-list'),
     path('deactivate', deactivate_account_view, name='deactivate'),
 ]

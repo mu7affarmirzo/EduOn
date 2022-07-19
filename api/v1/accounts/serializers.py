@@ -43,6 +43,28 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return account
 
 
+class SpeakerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Account
+        fields = [
+            'email',
+            'phone_number',
+            'f_name',
+            'l_name',
+            'sex',
+            'speciality',
+            'profile_picture',
+            'interests',
+            'about_me',
+            'courses_count',
+            'enrolled_students_count',
+            'total_comments',
+            'overall_rating',
+            'voters_count',
+        ]
+
+
 class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
