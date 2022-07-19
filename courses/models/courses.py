@@ -49,7 +49,7 @@ class CourseModel(models.Model):
     cover_img = models.ImageField(upload_to=upload_location, null=True, blank=True)
     trailer_url = models.URLField(max_length=255, null=True)
 
-    is_valid = models.CharField(max_length=25, choices=VALIDITY_CHOICES, null=True)
+    is_valid = models.CharField(max_length=25, choices=VALIDITY_CHOICES, default="ON HOLD", null=True)
 
     @property
     def is_free(self):
