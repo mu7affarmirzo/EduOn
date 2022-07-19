@@ -133,6 +133,12 @@ class CoursesListView(ListCreateAPIView):
         else:
             return [AllowAny()]
 
+    def get(self, request, *args, **kwargs):
+        snippet = CourseModel.objects.filter(is_valid="VALID")
+        serializer = CourseSerializer(snippet, many=True)
+        return Response(serializer.data)
+
+
     @swagger_auto_schema(tags=['uploaded courses'], request_body=CourseSerializer)
     def post(self, request, *args, **kwargs):
         account = request.user
@@ -149,7 +155,7 @@ class CoursesListView(ListCreateAPIView):
 
 class CoursesDetailView(RetrieveUpdateDestroyAPIView):
     swagger_auto_schema(request_body=CourseSerializer, tags=['Courses'])
-    queryset = CourseModel.objects.all()
+    queryset = CourseModel.objects.filter(is_valid="VALID")
     serializer_class = CourseSerializer
 
     def get_permissions(self):

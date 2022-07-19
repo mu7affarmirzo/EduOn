@@ -14,7 +14,6 @@ urlpatterns = [
     path('lesson/', lesson_post_view, name='courses-lesson'),
 
 
-
     path('subcategories/', SubCategoriesListView.as_view(), name='sub-categories'),
     path('subcategories/<int:pk>', SubCategoriesDetailView.as_view(), name='sub-categories-detail'),
     path('categories/', CategoriesListView.as_view(), name='categories'),
