@@ -14,13 +14,13 @@
     var video = document.getElementById('video');
     if (Hls.isSupported()) {
         var hls = new Hls();
-        hls.loadSource(`http://localhost:8080/media/${media_id}/${resolution}/stream/`);
+        hls.loadSource(`${window.location.origin}/media/${media_id}/${resolution}/stream/`);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, function () {
             video.play();
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = `http://localhost:8080/media/${media_id}/${resolution}/stream/`;
+        video.src = `${window.location.origin}/media/${media_id}/${resolution}/stream/`;
         video.addEventListener('loadedmetadata', function () {
             video.play();
         });
