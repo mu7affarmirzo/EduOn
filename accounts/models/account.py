@@ -84,6 +84,42 @@ class Account(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+    @property
+    def courses_count(self):
+        if self.is_speaker:
+            return self.courses.count()
+        else:
+            return 0
+
+    @property
+    def enrolled_students_count(self):
+        count = 0
+        for i in self.courses.all():
+            count += i.enrolled_course.count()
+        return count
+
+    @property
+    def total_comments(self):
+        count = 0
+        for i in self.courses.all():
+            count += i.comments_count
+        return count
+
+    @property
+    def rating(self):
+        rating = 0
+        voters = 0
+        for i in self.courses.all():
+            rating += i.course_rating
+            voters += i.voters_count
+
+        print(rating)
+        print(voters)
+        if not voters == 0:
+            return float("{:.1f}".format(rating/voters))
+        else:
+            return 0
+
     class Meta:
         app_label = "accounts"
 

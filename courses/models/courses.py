@@ -55,6 +55,26 @@ class CourseModel(models.Model):
     def is_free(self):
         return True if self.price == 0 else False
 
+    @property
+    def comments_count(self):
+        return self.comments.count()
+
+    @property
+    def course_rating(self):
+        overall_rating = 0
+
+        for i in self.rating.values():
+            overall_rating += i['rating']
+
+        if not self.rating.count() == 0:
+            overall_rating = overall_rating/self.rating.count()
+        return float("{:.1f}".format(overall_rating))
+
+    @property
+    def voters_count(self):
+        return self.rating.count()
+
+
     def __str__(self):
         return self.name
 
@@ -93,7 +113,7 @@ class FavCoursesModel(models.Model):
 
 class EnrolledCoursesModel(models.Model):
     course = models.ForeignKey(CourseModel, related_name='enrolled_course', blank=True, on_delete=models.CASCADE)
-    user = models.ForeignKey(Account, related_name='enrolled_course', blank=True, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, related_name='enrolled_student', blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(f"{self.user.phone_number} - {self.course.name}")

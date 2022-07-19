@@ -327,9 +327,3 @@ def remove_fav_courses(request, pk):
     course.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-@swagger_auto_schema(method='POST', tags=['Fav courses'])
-@permission_classes([IsOwnerOrReadOnly, IsAuthenticated])
-@api_view(['POST'])
-def add_to_fav_courses(request, pk):
-    pass

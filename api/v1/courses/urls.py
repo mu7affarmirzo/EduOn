@@ -29,5 +29,6 @@ urlpatterns = [
 
     path('enrolled-courses/', EnrolledCoursesView.as_view(), name='fav-course'),
     path('uploaded-courses/', my_uploaded_course, name='uploaded-course'),
+
 ]
 
