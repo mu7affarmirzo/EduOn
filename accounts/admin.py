@@ -12,12 +12,12 @@ class CountryAdmin(admin.ModelAdmin):
     pass
 
 
+@register(Account)
 class AccountsAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('phone_number', 'email', 'f_name', 'l_name')
 
 
-admin.site.register(Account, AccountsAdmin)
-admin.site.register(CreditCardModel, AccountsAdmin)
+admin.site.register(CreditCardModel, CountryAdmin)
 
 admin.site.register(CountryModel, CountryAdmin)
 admin.site.register(ProvinceModel, CountryAdmin)

@@ -147,7 +147,6 @@ def account_detail_view(request):
 
 @swagger_auto_schema(method="get", tags=["accounts"])
 @api_view(['GET', ])
-# @permission_classes((IsAuthenticated,))
 def speaker_detail_view(request, pk):
 
     if request.method == 'GET':

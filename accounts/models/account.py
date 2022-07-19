@@ -106,19 +106,22 @@ class Account(AbstractBaseUser):
         return count
 
     @property
-    def rating(self):
+    def overall_rating(self):
         rating = 0
-        voters = 0
         for i in self.courses.all():
             rating += i.course_rating
-            voters += i.voters_count
 
-        print(rating)
-        print(voters)
-        if not voters == 0:
-            return float("{:.1f}".format(rating/voters))
+        if not self.courses.count() == 0:
+            return float("{:.2f}".format(rating/self.courses.count()))
         else:
-            return 0
+            return 5
+
+    @property
+    def voters_count(self):
+        count = 0
+        for i in self.courses.all():
+            count += i.voters_count
+        return count
 
     class Meta:
         app_label = "accounts"

@@ -68,12 +68,13 @@ class CourseModel(models.Model):
 
         if not self.rating.count() == 0:
             overall_rating = overall_rating/self.rating.count()
+        else:
+            return 5
         return float("{:.1f}".format(overall_rating))
 
     @property
     def voters_count(self):
         return self.rating.count()
-
 
     def __str__(self):
         return self.name

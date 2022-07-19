@@ -60,7 +60,8 @@ class SpeakerSerializer(serializers.ModelSerializer):
             'courses_count',
             'enrolled_students_count',
             'total_comments',
-            'rating',
+            'overall_rating',
+            'voters_count',
         ]
 
 
