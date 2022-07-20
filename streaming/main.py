@@ -1,5 +1,6 @@
 import asyncio
 import os
+import subprocess
 from typing import Union
 
 from fastapi import FastAPI, UploadFile, File, Request
@@ -9,9 +10,10 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
 from videoprops import get_video_properties
-
+import uuid
 import shutil
 import nest_asyncio
+
 nest_asyncio.apply()
 
 app = FastAPI()
@@ -41,6 +43,14 @@ async def stream(request: Request):
 async def upload(request: Request):
     return templates.TemplateResponse("upload.html", {"request": request})
 
+
+def get_length(filename):
+    result = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
+                             "format=duration", "-of",
+                             "default=noprint_wrappers=1:nokey=1", filename],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT)
+    return float(result.stdout)
 
 async def segment(media_id: int, base_url: str, input_file: str, path: str):
     media_dict = {}
@@ -172,7 +182,6 @@ async def segment(media_id: int, base_url: str, input_file: str, path: str):
         await proc.wait()
         media_dict['1440p'] = f"{base_url}media/{media_id}/1440p/stream"
 
-
     if int(props['width']) >= 3840 and int(props['height']) >= 2160:
         media_path = "{}/2160p".format(path)
         is_exist = os.path.exists(media_path)
@@ -194,19 +203,21 @@ async def segment(media_id: int, base_url: str, input_file: str, path: str):
         await proc.wait()
         media_dict['2160p'] = f"{base_url}media/{media_id}/2160p/stream"
 
+    media_dict['duration'] = get_length(input_file)
+
     return media_dict
 
 
-@app.post("/media/{media_id}/upload")
+@app.post("/media/upload")
 async def upload(
         request: Request,
-        media_id: int,
         video: UploadFile = File(
             ...,
             description="video file",
         ),
         subtitle: Union[UploadFile, None] = None,
 ):
+    media_id = uuid.uuid4()
     path = "media/{}/hls".format(media_id)
 
     is_exist = os.path.exists(path)
@@ -229,7 +240,7 @@ async def upload(
 
 @app.delete("/media/{media_id}/delete")
 async def delete_media_folder(
-        media_id: int,
+        media_id: str,
 ):
     path = "media/{}/hls".format(media_id)
 
@@ -241,7 +252,7 @@ async def delete_media_folder(
 
 @app.get("/media/{media_id}/{resolution}/stream")
 async def get_video_index(
-        media_id: int,
+        media_id: str,
         resolution: str,
 ):
     path = "media/{}/hls/{}".format(media_id, resolution)
@@ -251,7 +262,7 @@ async def get_video_index(
 
 @app.get("/media/{media_id}/{resolution}/{segment_name}")
 async def get_video_segment(
-        media_id: int,
+        media_id: str,
         resolution: str,
         segment_name: str,
 ):
@@ -262,7 +273,7 @@ async def get_video_segment(
 
 @app.get("/media/{media_id}/subtitle")
 async def get_video_subtitle(
-        media_id: int,
+        media_id: str,
 ):
     path = "media/{}".format(media_id)
     subtitle_file = "{}/index.srt".format(path)
