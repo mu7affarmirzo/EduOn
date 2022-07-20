@@ -137,16 +137,6 @@ class CoursesListView(ListCreateAPIView):
             return [AllowAny()]
 
     def get(self, request, *args, **kwargs):
-        print(request.headers['User-Agent'])
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        print(f"META: {request.META}")
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-        print(ip)
-        # print(f"User-Agent: {request.headers['User-Agent']} - Origin: {request.headers['Origin']} - Host: {request.headers['Origin']}")
-
         snippet = CourseModel.objects.filter(is_valid="VALID")
         serializer = CourseSerializer(snippet, many=True)
         return Response(serializer.data)

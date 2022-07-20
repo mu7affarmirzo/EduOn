@@ -260,6 +260,12 @@ class DevicesListView(APIView):
 
     @swagger_auto_schema(tags=['devices'], request_body=DevicesSerializer)
     def post(self, request, format=None):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        print(ip)
         print(f"User-Agent: {request.headers['User-Agent']} - Origin: {request.headers['Origin']} - Host: {request.headers['Origin']}")
         account = request.user
         device = DeviceModel(owner=account)
