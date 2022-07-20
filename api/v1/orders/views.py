@@ -84,10 +84,9 @@ def proceed_payment(request):
     account = request.user
     wallet = get_wallet(account)
     total_price = get_cart_total_price(account)
+    status_order = proceed_transfer(wallet, total_price)
 
-    proceed_transfer(wallet, total_price)
-
-    return Response({"status": True, "message": f"{wallet}", "cart_total_price": f"{total_price}"})
+    return status_order
 
 
 class ProceedOrder(APIView):

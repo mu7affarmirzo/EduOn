@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from api.v1.wallet.utils import login_to
 from orders.models import CartModel
-from wallet.models import WalletModel
+from wallet.models import WalletModel, TransferModel
 
 EDUON_WALLET = config('EDUON_WALLET')
 
@@ -49,9 +49,10 @@ def proceed(cart_items, status):
 
 def proceed_transfer(wallet, total_price):
     # TODO: check if enough money
+    # TODO: transfer from user wallet to EduOn
     payload = {
         "id": "{{$randomUUID}}",
-        "method": "transfer.proceed",
+        "method": "transfer.create",
         "params": {
             "number": f"{wallet.card_number}",
             "expire": f"{wallet.expire}",
@@ -65,23 +66,41 @@ def proceed_transfer(wallet, total_price):
         return Response({'message': 'Service is not working.'})
 
     if response_data.json()['status']:
+        try:
+            TransferModel.objects.create(
+                wallet=wallet, tr_id=response_data.json()['result']['tr_id'],
+                status=False, amount=total_price,
+                sender="", type=False
+            )
+        except:
+            return Response({'status': True, 'message': "TransferModel object create failed!", 'tr_id': response_data.json()['result']['tr_id']})
+
         return Response(response_data.json())
-    elif response_data.json()['error']['code'] == -15:
+    elif response_data.json()['error']['code'] == '-15':
         return Response(response_data.json())
-    elif response_data.json()['error']['code'] == 404:
+    elif response_data.json()['error']['code'] == '404':
         token = login_to()
         try:
             data = requests.post(url=WALLET_URL, json=payload, headers={"token": f"{token}"})
         except:
             return Response({'status': False, 'message': 'Service is not working.'})
+
+        try:
+            print(f"before creating transferModel: {data.json()}")
+            print()
+            TransferModel.objects.create(
+                wallet=wallet, tr_id=data.json()['result']['tr_id'],
+                status=False, amount=total_price,
+                sender=str(EDUON_WALLET), type=False
+            )
+        except:
+            return Response({'status': True, 'message': "TransferModel object create failed!", 'tr_id': data.json()['result']['tr_id']})
+
         return Response(data.json())
     else:
         return Response(response_data.json())
 
-    # TODO: transfer from user wallet to EduOn
     # TODO: transfer from EduOn to speaker
     # TODO: rollback in case of exception
 
-
-    pass
 

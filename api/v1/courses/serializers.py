@@ -25,8 +25,15 @@ class CommentsSerializer(serializers.ModelSerializer):
         return phone_number
 
     def get_username_from_author(self, comment):
-        username = f"{comment.author.f_name} {comment.author.l_name}"
-        profile_picture = comment.author.profile_picture.url
+        try:
+            username = f"{comment.author.f_name} {comment.author.l_name}"
+        except:
+            username = ""
+        try:
+            profile_picture = comment.author.profile_picture.url
+        except:
+            profile_picture = ""
+
         return {"full_name": username, "picture": str(profile_picture)}
 
 
@@ -146,5 +153,9 @@ class SubCategoryCoursesSerializer(serializers.ModelSerializer):
         ]
 
 
+class SearchSerializer(serializers.Serializer):
+    word = serializers.CharField(max_length=255)
 
+    class Meta:
+        fields = "__all__"
 

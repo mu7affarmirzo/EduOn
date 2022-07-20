@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
@@ -8,6 +9,8 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.models import Account
+from api.v1.accounts.serializers import AccountSerializer
 from api.v1.courses.permissions import IsOwnerOrReadOnly
 from api.v1.courses.serializers import *
 from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel, ModuleModel
@@ -332,4 +335,31 @@ def remove_fav_courses(request, pk):
 
     course.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@swagger_auto_schema(method='POST', tags=['search'], request_body=SearchSerializer)
+@api_view(['POST', ])
+def search_view(request):
+
+    a = request.data['word']
+    print(request.data['word'])
+    if request.method == 'POST':
+        queryset_news = CourseModel.objects.filter(
+            Q(name__icontains=a) |
+            Q(short_descr__icontains=a))
+
+        queryset_tenders = Account.objects.filter(
+            Q(is_speaker=True) &
+            Q(f_name__icontains=a) |
+            Q(l_name__icontains=a) |
+            Q(speciality__icontains=a))
+
+        serializer_courses = CourseSerializer(queryset_news, many=True)
+        serializer_speakers = AccountSerializer(queryset_tenders, many=True)
+        new_data = {
+            "found_courses": serializer_courses.data,
+            "found_speakers": serializer_speakers.data
+        }
+
+        return Response(new_data)
 
