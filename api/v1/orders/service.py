@@ -86,12 +86,10 @@ def proceed_transfer(wallet, total_price):
             return Response({'status': False, 'message': 'Service is not working.'})
 
         try:
-            print(f"before creating transferModel: {data.json()}")
-            print()
             TransferModel.objects.create(
                 wallet=wallet, tr_id=data.json()['result']['tr_id'],
                 status=False, amount=total_price,
-                sender=str(EDUON_WALLET), type=False
+                destination=str(EDUON_WALLET), type=False
             )
         except:
             return Response({'status': True, 'message': "TransferModel object create failed!", 'tr_id': data.json()['result']['tr_id']})
