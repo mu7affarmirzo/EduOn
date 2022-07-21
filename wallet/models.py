@@ -31,6 +31,9 @@ class TransferModel(models.Model):
     def __str__(self):
         return str(self.tr_id)
 
+    class Meta:
+        ordering = ("-date_created",)
+
 
 class CardModel(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)

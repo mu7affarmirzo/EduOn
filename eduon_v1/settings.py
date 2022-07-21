@@ -38,6 +38,8 @@ WALLET_TOKEN = os.environ.get("WALLET_TOKEN", "wtf")
 # Application definition
 
 INSTALLED_APPS = [
+    'django_filters',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -69,6 +71,11 @@ REST_FRAMEWORK = {
 
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
+    ],
+
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [

@@ -1,16 +1,22 @@
+import django_filters
 from django.db.models import Q
+# from django.db.models.utils import list_to_queryset
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
+from rest_framework import filters
 from rest_framework.views import APIView
+
 
 from accounts.models import Account
 from api.v1.accounts.serializers import AccountSerializer
+from api.v1.courses.filters import CourseFilter
 from api.v1.courses.permissions import IsOwnerOrReadOnly
 from api.v1.courses.serializers import *
 from courses.models.courses import CourseModel, FavCoursesModel, EnrolledCoursesModel, ModuleModel
@@ -125,6 +131,33 @@ class CategoriesDetailView(RetrieveAPIView):
         return self.retrieve(request, *args, **kwargs)
 
 
+class CourseListFilterView(ListAPIView):
+    queryset = CourseModel.objects.filter(is_valid="VALID")
+    serializer_class = CourseSerializer
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filterset_class = CourseFilter
+    ordering_fields = ['price', 'email']
+    ordering = ['price']
+
+
+@swagger_auto_schema(tags=['categories'], method="get")
+@api_view(['GET'])
+def filter_by_rating(request, pk):
+    print(pk)
+    filtered_queryset = []
+    queryset = CourseModel.objects.all()
+    print(type(queryset))
+    for i in queryset:
+        if i.course_rating >= pk and i.course_rating <= (pk+1):
+            print(i.course_rating)
+            filtered_queryset.append(i)
+    print(filtered_queryset)
+    # filtered_queryset = list_to_queryset(filtered_queryset)
+    serializer = CourseSerializer(filtered_queryset)
+    print(serializer.data)
+    return Response(serializer.data)
+
+
 class CoursesListView(ListCreateAPIView):
     queryset = CourseModel.objects.all()
     serializer_class = CourseSerializer
@@ -138,9 +171,13 @@ class CoursesListView(ListCreateAPIView):
 
     def get(self, request, *args, **kwargs):
         snippet = CourseModel.objects.filter(is_valid="VALID")
+        course_filter = CourseFilter(request.GET, queryset=snippet)
+        ordering_fields = ['price', 'course_rating']
+
+        if course_filter.is_valid():
+            snippet = course_filter.qs
         serializer = CourseSerializer(snippet, many=True)
         return Response(serializer.data)
-
 
     @swagger_auto_schema(tags=['uploaded courses'], request_body=CourseSerializer)
     def post(self, request, *args, **kwargs):
