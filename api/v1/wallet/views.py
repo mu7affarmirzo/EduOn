@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.v1.wallet.serializers import *
-from api.v1.wallet.utils import login_to, withdraw_from_wallet_service, transfer_service
+from api.v1.wallet.utils import login_to, withdraw_from_wallet_service, transfer_service, confirm_transfer_service
 from django.conf import settings
 from wallet.models import WalletModel, TransferModel, CardModel, VoucherModel
 
@@ -93,6 +93,21 @@ def transfer_to_wallet(request):
         if serializers.is_valid():
             data = serializers.data
             return transfer_service(wallet, data)
+
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(method="post", tags=["wallet"], request_body=ConfirmTransferSerializer)
+@permission_classes((IsAuthenticated,))
+@api_view(['POST'])
+def confirm_transfer_to_wallet(request):
+
+    if request.method == 'POST':
+        serializers = ConfirmTransferSerializer(data=request.data)
+
+        if serializers.is_valid():
+            data = serializers.data
+            return confirm_transfer_service(data)
 
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
