@@ -75,7 +75,7 @@ async def segment(media_id: int, base_url: str, input_file: str, path: str):
             stderr=asyncio.subprocess.PIPE
         )
         await proc.wait()
-        media_dict['240p'] = f"{base_url}media/{media_id}/240p/stream"
+        media_dict['p240'] = f"{base_url}media/{media_id}/240p/stream"
 
     if int(props['width']) >= 640 and int(props['height']) >= 360:
         media_path = "{}/360p".format(path)
@@ -96,7 +96,7 @@ async def segment(media_id: int, base_url: str, input_file: str, path: str):
             stderr=asyncio.subprocess.PIPE
         )
         await proc.wait()
-        media_dict['360p'] = f"{base_url}media/{media_id}/360p/stream"
+        media_dict['p360'] = f"{base_url}media/{media_id}/360p/stream"
 
     if int(props['width']) >= 854 and int(props['height']) >= 480:
         media_path = "{}/480p".format(path)
@@ -117,7 +117,7 @@ async def segment(media_id: int, base_url: str, input_file: str, path: str):
             stderr=asyncio.subprocess.PIPE
         )
         await proc.wait()
-        media_dict['480p'] = f"{base_url}media/{media_id}/480p/stream"
+        media_dict['p480'] = f"{base_url}media/{media_id}/480p/stream"
 
     if int(props['width']) >= 1280 and int(props['height']) >= 720:
         media_path = "{}/720p".format(path)
@@ -138,7 +138,7 @@ async def segment(media_id: int, base_url: str, input_file: str, path: str):
             stderr=asyncio.subprocess.PIPE
         )
         await proc.wait()
-        media_dict['720p'] = f"{base_url}media/{media_id}/720p/stream"
+        media_dict['p720'] = f"{base_url}media/{media_id}/720p/stream"
 
     if int(props['width']) >= 1920 and int(props['height']) >= 1080:
         media_path = "{}/1080p".format(path)
@@ -159,7 +159,7 @@ async def segment(media_id: int, base_url: str, input_file: str, path: str):
             stderr=asyncio.subprocess.PIPE
         )
         await proc.wait()
-        media_dict['1080p'] = f"{base_url}media/{media_id}/1080p/stream"
+        media_dict['p1080'] = f"{base_url}media/{media_id}/1080p/stream"
 
     if int(props['width']) >= 2560 and int(props['height']) >= 1440:
         media_path = "{}/1440p".format(path)
@@ -180,7 +180,7 @@ async def segment(media_id: int, base_url: str, input_file: str, path: str):
             stderr=asyncio.subprocess.PIPE
         )
         await proc.wait()
-        media_dict['1440p'] = f"{base_url}media/{media_id}/1440p/stream"
+        media_dict['p1440'] = f"{base_url}media/{media_id}/1440p/stream"
 
     if int(props['width']) >= 3840 and int(props['height']) >= 2160:
         media_path = "{}/2160p".format(path)
@@ -201,7 +201,7 @@ async def segment(media_id: int, base_url: str, input_file: str, path: str):
             stderr=asyncio.subprocess.PIPE
         )
         await proc.wait()
-        media_dict['2160p'] = f"{base_url}media/{media_id}/2160p/stream"
+        media_dict['p2160'] = f"{base_url}media/{media_id}/2160p/stream"
 
     media_dict['duration'] = get_length(input_file)
 
