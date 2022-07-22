@@ -84,7 +84,7 @@ def create_wallet_util(phone_number):
 def withdraw_from_wallet_service(wallet, data):
     payload = {
         "id": "{{$randomUUID}}",
-        "method": "transfer.proceed",
+        "method": "transfer.create",
         "params": {
             "number": f"{wallet.card_number}",
             "expire": f"{wallet.expire}",
@@ -106,8 +106,8 @@ def withdraw_from_wallet_service(wallet, data):
                 destination=data['number'], status=False
             )
         except:
-            return Response({'status': True, 'message': "TransferModel object create failed!", 'tr_id': resp_data.json()['result']['tr_id']})
-        return Response(resp_data.json())
+            return Response({'status': True, 'message': "TransferModel object create failed!", 'tr_id': resp_data['result']['tr_id']})
+        return Response(resp_data)
     else:
         token = login_to()
         try:
