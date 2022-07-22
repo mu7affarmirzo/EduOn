@@ -14,6 +14,10 @@ class ConfirmTransferSerializer(serializers.Serializer):
     code = serializers.CharField(required=False, allow_blank=True, max_length=100)
 
 
+class ConfirmWithdrawSerializer(serializers.Serializer):
+    tr_id = serializers.CharField(required=False, allow_blank=True, max_length=100)
+
+
 class WalletHistorySerializer(serializers.Serializer):
     start_date = serializers.DateField(required=False)
     end_date = serializers.DateField(required=False)
