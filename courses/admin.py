@@ -20,7 +20,8 @@ class CourseAdmin(admin.ModelAdmin):
         "name",
         "subcategory",
         "course_owner",
-        "price"
+        "price",
+        "is_valid"
     )
 
 

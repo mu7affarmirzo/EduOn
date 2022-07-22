@@ -7,6 +7,10 @@ urlpatterns = [
     path('', CoursesListView.as_view(), name='courses'),
     path('<int:pk>', CoursesDetailView.as_view(), name='courses-detail'),
 
+    path('filter/', CourseListFilterView.as_view(), name='filter'),
+    path('filter/<int:pk>', filter_by_rating, name='filter'),
+
+
     path('module/<int:pk>', ModuleListView.as_view(), name='courses-modules-detail'),
     path('module/', modules_post_view, name='courses-modules'),
 

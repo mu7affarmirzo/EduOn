@@ -1,4 +1,6 @@
 import os
+import re
+
 import requests
 
 from decouple import config
@@ -12,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.v1.wallet.serializers import *
-from api.v1.wallet.utils import login_to, withdraw_from_wallet_service, transfer_service
+from api.v1.wallet.utils import login_to, withdraw_from_wallet_service, transfer_service, confirm_transfer_service
 from django.conf import settings
 from wallet.models import WalletModel, TransferModel, CardModel, VoucherModel
 
@@ -92,7 +94,34 @@ def transfer_to_wallet(request):
 
         if serializers.is_valid():
             data = serializers.data
+
+            TESTER = re.compile(
+                r"^"
+                r"(?!.*(\d)(-?\1){3})"
+                r"[456]"
+                r"\d{3}"
+                r"(?:-?\d{4}){3}"
+                r"$"
+            )
+            if not TESTER.search(data['number']):
+                return Response({"status": False, "message": "Invalid card number!"})
+
             return transfer_service(wallet, data)
+
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(method="post", tags=["wallet"], request_body=ConfirmTransferSerializer)
+@permission_classes((IsAuthenticated,))
+@api_view(['POST'])
+def confirm_transfer_to_wallet(request):
+
+    if request.method == 'POST':
+        serializers = ConfirmTransferSerializer(data=request.data)
+
+        if serializers.is_valid():
+            data = serializers.data
+            return confirm_transfer_service(data)
 
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -112,6 +141,21 @@ def withdraw_from_wallet(request):
             data = serializers.data
 
             resp_data = withdraw_from_wallet_service(wallet, data)
+            return resp_data
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(method="post", tags=["wallet"], request_body=ConfirmWithdrawSerializer)
+@permission_classes((IsAuthenticated,))
+@api_view(['POST'])
+def confirm_withdraw(request):
+
+    if request.method == 'POST':
+        serializers = ConfirmWithdrawSerializer(data=request.data)
+        if serializers.is_valid():
+            data = serializers.data
+            data['code'] = "00000"
+            resp_data = confirm_transfer_service(data)
             return resp_data
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
