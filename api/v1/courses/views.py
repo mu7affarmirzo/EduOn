@@ -105,7 +105,7 @@ class SubCategoriesListView(ListAPIView):
 
 class SubCategoriesDetailView(RetrieveAPIView):
     swagger_auto_schema(request_body=SubCategoriesSerializer, tags=['SubCategories'])
-    queryset = SubCategoriesModel.objects.all()
+    queryset = SubCategoriesModel.objects.filter(courses__is_valid="VALID")
     serializer_class = SubCategoryCoursesSerializer
 
     @swagger_auto_schema(tags=['categories'])

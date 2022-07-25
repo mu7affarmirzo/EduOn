@@ -142,7 +142,12 @@ class EnrolledCoursesSerializer(serializers.ModelSerializer):
 
 
 class SubCategoryCoursesSerializer(serializers.ModelSerializer):
-    courses = CourseSerializer(many=True)
+    courses = serializers.SerializerMethodField()
+
+    def get_courses(self, subcategory):
+        qs = CourseModel.objects.filter(is_valid="VALID", subcategory=subcategory)
+        serializer = CourseSerializer(instance=qs, many=True)
+        return serializer.data
 
     class Meta:
         model = SubCategoriesModel

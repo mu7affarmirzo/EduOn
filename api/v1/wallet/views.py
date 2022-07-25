@@ -103,6 +103,8 @@ def transfer_to_wallet(request):
                 r"(?:-?\d{4}){3}"
                 r"$"
             )
+
+            # TODO : let's check 404
             if not TESTER.search(data['number']):
                 return Response({"status": False, "message": "Invalid card number!"})
 
