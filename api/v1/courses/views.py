@@ -162,6 +162,7 @@ class CoursesListView(ListCreateAPIView):
     queryset = CourseModel.objects.all()
     serializer_class = CourseSerializer
 
+
     def get_permissions(self):
         method = self.request.method
         if method == 'POST':
@@ -197,6 +198,7 @@ class CoursesDetailView(RetrieveUpdateDestroyAPIView):
     swagger_auto_schema(request_body=CourseSerializer, tags=['Courses'])
     queryset = CourseModel.objects.filter(is_valid="VALID")
     serializer_class = CourseSerializer
+
 
     def get_permissions(self):
         method = self.request.method

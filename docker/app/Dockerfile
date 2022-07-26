@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1
 
 RUN groupadd -r app && useradd -r -g app app
 
-RUN mkdir -p /app/media /app/static \
+RUN mkdir -p /app/media /app/static /app/media_cdn /app/static_cdn \
     && chown -R app:app /app/
 
 RUN apt-get update && \

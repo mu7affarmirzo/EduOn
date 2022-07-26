@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.7
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -9,7 +9,7 @@ RUN mkdir -p /app/media /app/static /app/media \
     && chown -R app:app /app/
 
 RUN apt-get update && \
-    apt-get install -y gettext
+    apt-get install -y gettext ffmpeg
 
 COPY ./streaming/requirements.txt /app/
 

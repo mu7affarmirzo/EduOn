@@ -10,6 +10,7 @@
         name="uploadform"
 >
     <input type="file" name="video"/>
+    <input type="file" name="subtitle"/>
     <input type="submit"/>
 </form>
 <script type="text/javascript">
@@ -19,8 +20,7 @@
 
     function get_action() {
         const urlParams = new URLSearchParams(window.location.search);
-        const media_id = urlParams.get('media_id');
-        return "http://localhost:8080/media/" + media_id + "/upload";
+        return window.location.origin + "/media/upload";
     }
 </script>
 </body>

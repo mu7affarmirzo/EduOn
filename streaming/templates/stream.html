@@ -10,16 +10,17 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const media_id = urlParams.get('media_id');
+    const resolution = urlParams.get('resolution');
     var video = document.getElementById('video');
     if (Hls.isSupported()) {
         var hls = new Hls();
-        hls.loadSource(`http://localhost:8080/media/${media_id}/stream/`);
+        hls.loadSource(`${window.location.origin}/media/${media_id}/${resolution}/stream/`);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, function () {
             video.play();
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = `http://localhost:8080/media/${media_id}/stream/`;
+        video.src = `${window.location.origin}/media/${media_id}/${resolution}/stream/`;
         video.addEventListener('loadedmetadata', function () {
             video.play();
         });
