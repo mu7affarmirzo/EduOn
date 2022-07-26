@@ -109,8 +109,6 @@ class ModuleModel(models.Model):
         return str(f"{self.course.name} - {self.name}")
 
 
-
-
 class LessonsModel(models.Model):
     module = models.ForeignKey(ModuleModel, related_name='lessons', blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
@@ -118,8 +116,12 @@ class LessonsModel(models.Model):
     subtitle_url = models.URLField(max_length=255, null=True)
     about = models.TextField(null=True)
     resource_file = models.FileField(null=True)# TODO:
+    resolution_240p = models.URLField(blank=True, null=True)
+    resolution_360p = models.URLField(blank=True, null=True)
+    resolution_480p = models.URLField(blank=True, null=True)
+    resolution_720p = models.URLField(blank=True, null=True)
+    resolution_1080p = models.URLField(blank=True, null=True)
     duration = models.DurationField(null=True)
-
 
     def __str__(self):
         return str(f"{self.module.name} - {self.name}")
