@@ -1,3 +1,4 @@
+import datetime
 from uuid import uuid4
 
 from django.db import models
@@ -76,13 +77,33 @@ class CourseModel(models.Model):
     def voters_count(self):
         return self.rating.count()
 
+    @property
+    def course_duration(self):
+        sum_duration = datetime.timedelta(0, 0)
+        for i in self.module.all():
+            for j in i.lessons.all():
+                sum_duration += j.duration
+            print(i.lessons.all())
+
+        return sum_duration
+
     def __str__(self):
         return self.name
+
+
 
 
 class ModuleModel(models.Model):
     course = models.ForeignKey(CourseModel, related_name='module', blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+
+    @property
+    def model_duration(self):
+        sum_duration = datetime.timedelta(0, 0)
+        # print(self.lessons.values())
+        for i in self.lessons.values():
+            sum_duration += i["duration"]
+        return sum_duration
 
     def __str__(self):
         return str(f"{self.course.name} - {self.name}")
@@ -95,6 +116,11 @@ class LessonsModel(models.Model):
     subtitle_url = models.URLField(max_length=255, null=True)
     about = models.TextField(null=True)
     resource_file = models.FileField(null=True)# TODO:
+    resolution_240p = models.URLField(blank=True, null=True)
+    resolution_360p = models.URLField(blank=True, null=True)
+    resolution_480p = models.URLField(blank=True, null=True)
+    resolution_720p = models.URLField(blank=True, null=True)
+    resolution_1080p = models.URLField(blank=True, null=True)
     duration = models.DurationField(null=True)
 
     def __str__(self):

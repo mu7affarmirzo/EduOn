@@ -55,6 +55,7 @@ def step_one(request):
         serializer = OtpSerializer(otp_code, data=serializer_data)
         data = {}
 
+
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -70,6 +71,10 @@ def step_one(request):
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=StepTwoSerializer)
 @api_view(['POST'])
 def step_two(request):
+    account = request.user
+    device = DeviceModel(owner=account)
+    serializer = DevicesSerializer(device, data=request.data)
+
     if request.method == 'POST':
         data = request.data
         context = {}
@@ -98,6 +103,10 @@ def step_two(request):
         else:
             return Response({'status': False, 'message': 'The code is not correct'}, status=status.HTTP_404_NOT_FOUND)
 
+    if serializer.is_valid():
+        serializer.save()
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response({'status': True, 'message': 'Code verified!'}, status=status.HTTP_200_OK)
 
 
