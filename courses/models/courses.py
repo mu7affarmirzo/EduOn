@@ -1,3 +1,4 @@
+import datetime
 from uuid import uuid4
 
 from django.db import models
@@ -75,6 +76,18 @@ class CourseModel(models.Model):
     @property
     def voters_count(self):
         return self.rating.count()
+
+    @property
+    def course_duration(self):
+        sum_duration = datetime.timedelta(0, 0)
+        # print(self.module.all())
+        for i in self.module.all():
+            # map(lambda sum_duration: sum_duration +)
+            for j in i.lessons.all():
+                sum_duration += j.duration
+            print(i.lessons.all())
+
+        return sum_duration
 
     def __str__(self):
         return self.name
