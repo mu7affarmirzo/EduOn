@@ -196,8 +196,15 @@ class CoursesListView(ListCreateAPIView):
 
 class CoursesDetailView(RetrieveUpdateDestroyAPIView):
     swagger_auto_schema(request_body=CourseSerializer, tags=['Courses'])
-    queryset = CourseModel.objects.filter(is_valid="VALID")
     serializer_class = CourseSerializer
+
+    def get_queryset(self):
+        method = self.request.method
+        if method == 'GET':
+            queryset = CourseModel.objects.filter(is_valid="VALID")
+        else:
+            queryset = CourseModel.objects.all()
+        return queryset
 
     def get_permissions(self):
         method = self.request.method

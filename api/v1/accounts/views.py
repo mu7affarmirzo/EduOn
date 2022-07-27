@@ -270,6 +270,7 @@ class DevicesListView(APIView):
     @swagger_auto_schema(tags=['devices'], request_body=DevicesSerializer)
     def post(self, request, format=None):
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        print(request.headers)
         if x_forwarded_for:
             ip = x_forwarded_for.split(',')[0]
         else:
