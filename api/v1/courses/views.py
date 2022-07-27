@@ -199,11 +199,10 @@ class CoursesDetailView(RetrieveUpdateDestroyAPIView):
     queryset = CourseModel.objects.filter(is_valid="VALID")
     serializer_class = CourseSerializer
 
-
     def get_permissions(self):
         method = self.request.method
         if method == 'PATCH' or method == 'DELETE' or method == 'PUT':
-            return [IsAuthenticated(), IsOwnerOrReadOnly]
+            return [IsAuthenticated(), IsOwnerOrReadOnly()]
         else:
             return [AllowAny()]
 
