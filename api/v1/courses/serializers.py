@@ -80,6 +80,7 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseModel
         fields = '__all__'
+        read_only_fields = ('is_valid',)
 
     def get_username_from_author(self, obj):
         try:
