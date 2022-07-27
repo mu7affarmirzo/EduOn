@@ -198,7 +198,7 @@ class CoursesDetailView(RetrieveUpdateDestroyAPIView):
     swagger_auto_schema(request_body=CourseSerializer, tags=['Courses'])
     serializer_class = CourseSerializer
 
-    def get_serializer_class(self):
+    def get_queryset(self):
         method = self.request.method
         if method == 'GET':
             queryset = CourseModel.objects.filter(is_valid="VALID")
