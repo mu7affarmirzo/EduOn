@@ -82,6 +82,7 @@ class CartDetailView(APIView):
 @api_view(["POST"])
 def proceed_payment(request):
     account = request.user
+    #TODO: call cart
     wallet = get_wallet(account)
     total_price = get_cart_total_price(account)
     status_order = proceed_transfer(wallet, total_price)
