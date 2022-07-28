@@ -6,6 +6,7 @@ app_name = 'courses'
 urlpatterns = [
     path('', CoursesListView.as_view(), name='courses'),
     path('<int:pk>', CoursesDetailView.as_view(), name='courses-detail'),
+    path('speaker/<int:pk>', courses_list_by_speaker, name='courses-list-by-speaker'),
 
     path('filter/', CourseListFilterView.as_view(), name='filter'),
     path('filter/<int:pk>', filter_by_rating, name='filter'),
