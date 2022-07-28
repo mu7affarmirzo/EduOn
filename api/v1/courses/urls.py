@@ -15,6 +15,8 @@ urlpatterns = [
     path('module/<int:pk>', ModuleListView.as_view(), name='courses-modules-detail'),
     path('module/', modules_post_view, name='courses-modules'),
 
+    path('watch/module<int:pk>', watch_modules_view, name='watch-courses'),
+
     path('lesson/', lesson_post_view, name='courses-lesson'),
     path('lesson/<int:pk>', LessonsListView.as_view(), name='courses-lesson-detail'),
 

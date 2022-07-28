@@ -91,19 +91,17 @@ class CourseModel(models.Model):
         return self.name
 
 
-
-
 class ModuleModel(models.Model):
     course = models.ForeignKey(CourseModel, related_name='module', blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
     @property
-    def model_duration(self):
+    def module_duration(self):
         sum_duration = datetime.timedelta(0, 0)
-        # print(self.lessons.values())
         for i in self.lessons.values():
             sum_duration += i["duration"]
-        return sum_duration
+        s = int(sum_duration.total_seconds())
+        return '{:02}:{:02}:{:02}'.format(s // 3600, s % 3600 // 60, s % 60)
 
     def __str__(self):
         return str(f"{self.course.name} - {self.name}")

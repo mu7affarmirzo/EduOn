@@ -263,6 +263,26 @@ def modules_post_view(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(tags=['watch-course'], method='get')
+@permission_classes((IsAuthenticated,))
+@api_view(['GET'])
+def watch_modules_view(request, pk):
+    account = request.user
+    try:
+        course = CourseModel.objects.get(id=pk)
+    except CourseModel.DoesNotExist:
+        raise Http404
+
+    if EnrolledCoursesModel.objects.filter(course=course, user=account).exists():
+        print(EnrolledCoursesModel.objects.filter(course=course, user=account))
+        module = ModuleModel.objects.filter(course_id=pk)
+        serializer = WatchModulesSerializer(module, many=True)
+
+        return Response(serializer.data)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 class LessonsListView(APIView):
     queryset = LessonsModel.objects.all()
     permission_classes = [IsAuthenticated, ]

@@ -100,6 +100,13 @@ class LessonsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LessonsModel
+        fields = ['module', 'name']
+
+
+class LessonsIfEnrolledSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LessonsModel
         fields = '__all__'
 
 
@@ -113,6 +120,18 @@ class ModulesListSerializer(serializers.ModelSerializer):
 
     def sum(self, obj):
         return obj.model_duration
+
+
+class WatchModulesSerializer(serializers.ModelSerializer):
+    lessons = LessonsIfEnrolledSerializer(many=True)
+    module_duration = serializers.SerializerMethodField('get_duration')
+
+    class Meta:
+        model = ModuleModel
+        fields = '__all__'
+
+    def get_duration(self, obj):
+        return obj.module_duration
 
 
 class ModulesSerializer(serializers.ModelSerializer):
