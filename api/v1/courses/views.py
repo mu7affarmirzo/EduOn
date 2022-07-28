@@ -158,6 +158,14 @@ def filter_by_rating(request, pk):
     return Response(serializer.data)
 
 
+@swagger_auto_schema(tags=['courses'], method="get")
+@api_view(['GET'])
+def courses_list_by_speaker(request, pk):
+    queryset = CourseModel.objects.filter(course_owner_id=pk).filter(is_valid="VALID")
+    serializer = CourseSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
 class CoursesListView(ListCreateAPIView):
     queryset = CourseModel.objects.all()
     serializer_class = CourseSerializer
