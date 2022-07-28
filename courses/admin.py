@@ -10,7 +10,6 @@ admin.site.register(FavCoursesModel)
 admin.site.register(CategoriesModel)
 admin.site.register(SubCategoriesModel)
 admin.site.register(CommentsModel)
-admin.site.register(EnrolledCoursesModel)
 admin.site.register(RatingCoursesModel)
 
 
@@ -33,3 +32,8 @@ class ModuleAdmin(admin.ModelAdmin):
 @admin.register(LessonsModel)
 class LessonsAdmin(admin.ModelAdmin):
     list_display = ("name", "module")
+
+
+@admin.register(EnrolledCoursesModel)
+class ModuleAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "course")
