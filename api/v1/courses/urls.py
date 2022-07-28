@@ -15,8 +15,8 @@ urlpatterns = [
     path('module/<int:pk>', ModuleListView.as_view(), name='courses-modules-detail'),
     path('module/', modules_post_view, name='courses-modules'),
 
-    path('lesson/<int:pk>', LessonsListView.as_view(), name='courses-lesson-detail'),
     path('lesson/', lesson_post_view, name='courses-lesson'),
+    path('lesson/<int:pk>', LessonsListView.as_view(), name='courses-lesson-detail'),
 
 
     path('subcategories/', SubCategoriesListView.as_view(), name='sub-categories'),

@@ -5,6 +5,7 @@ from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from passlib.handlers.pbkdf2 import pbkdf2_sha256
 from rest_framework import status
+from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -70,10 +71,6 @@ def step_one(request):
 @swagger_auto_schema(method="post", tags=["accounts"], request_body=StepTwoSerializer)
 @api_view(['POST'])
 def step_two(request):
-    account = request.user
-    device = DeviceModel(owner=account)
-    serializer = DevicesSerializer(device, data=request.data)
-
     if request.method == 'POST':
         data = request.data
         context = {}
@@ -102,10 +99,6 @@ def step_two(request):
         else:
             return Response({'status': False, 'message': 'The code is not correct'}, status=status.HTTP_404_NOT_FOUND)
 
-    if serializer.is_valid():
-        serializer.save()
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response({'status': True, 'message': 'Code verified!'}, status=status.HTTP_200_OK)
 
 
@@ -223,7 +216,7 @@ def update_password_view(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'PUT':
-        serializer = ChangePasswordSerializer(account, data=request.data)
+        serializer = ChangePasswordSerializer(account, data=request.data, context={'request': request})
         data = {}
         if serializer.is_valid():
             serializer.save()
