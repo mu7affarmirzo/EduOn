@@ -55,7 +55,6 @@ def step_one(request):
         serializer = OtpSerializer(otp_code, data=serializer_data)
         data = {}
 
-
         if serializer.is_valid():
             serializer.save()
             data = {
