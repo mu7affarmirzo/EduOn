@@ -31,7 +31,7 @@ class ModuleAdmin(admin.ModelAdmin):
 
 @admin.register(LessonsModel)
 class LessonsAdmin(admin.ModelAdmin):
-    list_display = ("name", "module", "duration")
+    list_display = ("name", "module")
 
 
 @admin.register(EnrolledCoursesModel)

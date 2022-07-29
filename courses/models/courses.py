@@ -77,15 +77,15 @@ class CourseModel(models.Model):
     def voters_count(self):
         return self.rating.count()
 
-    @property
-    def course_duration(self):
-        sum_duration = datetime.timedelta(0, 0)
-        for i in self.module.all():
-            for j in i.lessons.all():
-                sum_duration += j.duration
-            print(i.lessons.all())
-
-        return sum_duration
+    # @property
+    # def course_duration(self):
+    #     sum_duration = datetime.timedelta(0, 0)
+    #     for i in self.module.all():
+    #         for j in i.lessons.all():
+    #             sum_duration += j.duration
+    #         print(i.lessons.all())
+    #
+    #     return sum_duration
 
     def __str__(self):
         return self.name
@@ -95,19 +95,19 @@ class ModuleModel(models.Model):
     course = models.ForeignKey(CourseModel, related_name='module', blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
-    @property
-    def module_duration(self):
-        sum_duration = datetime.timedelta(0, 0)
-        for i in self.lessons.values():
-            if i["duration"] is None:
-                continue
-            else:
-                sum_duration += i["duration"]
-        s = int(sum_duration.total_seconds())
-        return '{:02}:{:02}:{:02}'.format(s // 3600, s % 3600 // 60, s % 60)
-
-    def __str__(self):
-        return str(f"{self.course.name} - {self.name}")
+    # @property
+    # def module_duration(self):
+    #     sum_duration = datetime.timedelta(0, 0)
+    #     for i in self.lessons.values():
+    #         if i["duration"] is None:
+    #             continue
+    #         else:
+    #             sum_duration += i["duration"]
+    #     s = int(sum_duration.total_seconds())
+    #     return '{:02}:{:02}:{:02}'.format(s // 3600, s % 3600 // 60, s % 60)
+    #
+    # def __str__(self):
+    #     return str(f"{self.course.name} - {self.name}")
 
 
 class LessonsModel(models.Model):
@@ -122,7 +122,7 @@ class LessonsModel(models.Model):
     resolution_480p = models.URLField(blank=True, null=True)
     resolution_720p = models.URLField(blank=True, null=True)
     resolution_1080p = models.URLField(blank=True, null=True)
-    duration = models.DurationField()
+    # duration = models.DurationField()
 
     def __str__(self):
         return str(f"{self.module.name} - {self.name}")
