@@ -57,7 +57,7 @@ class CourseSerializer(serializers.ModelSerializer):
     enrolled_students = serializers.SerializerMethodField(read_only=True)
     is_free = serializers.SerializerMethodField(read_only=True)
     course_rating = serializers.SerializerMethodField(read_only=True)
-    course_duration = serializers.SerializerMethodField('get_course_duration')
+    # course_duration = serializers.SerializerMethodField('get_course_duration')
 
 
     def get_is_free(self, obj):
@@ -92,8 +92,8 @@ class CourseSerializer(serializers.ModelSerializer):
             username = obj.course_owner.id
         return username
 
-    def get_course_duration(self, obj):
-        return obj.course_duration
+    # def get_course_duration(self, obj):
+    #     return obj.course_duration
 
 
 class LessonsPostSerializer(serializers.ModelSerializer):
@@ -125,8 +125,8 @@ class ModulesListSerializer(serializers.ModelSerializer):
         model = ModuleModel
         fields = '__all__'
 
-    def get_duration(self, obj):
-        return obj.module_duration
+    # def get_duration(self, obj):
+    #     return obj.module_duration
 
 
 class WatchModulesSerializer(serializers.ModelSerializer):
@@ -137,8 +137,8 @@ class WatchModulesSerializer(serializers.ModelSerializer):
         model = ModuleModel
         fields = '__all__'
 
-    def get_duration(self, obj):
-        return obj.module_duration
+    # def get_duration(self, obj):
+    #     return obj.module_duration
 
 
 class ModulesSerializer(serializers.ModelSerializer):
@@ -146,7 +146,6 @@ class ModulesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModuleModel
         fields = '__all__'
-
 
 
 class FavCoursesSerializer(serializers.ModelSerializer):
