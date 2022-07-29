@@ -95,18 +95,18 @@ def transfer_to_wallet(request):
         if serializers.is_valid():
             data = serializers.data
 
-            TESTER = re.compile(
-                r"^"
-                r"(?!.*(\d)(-?\1){3})"
-                r"[456]"
-                r"\d{3}"
-                r"(?:-?\d{4}){3}"
-                r"$"
-            )
-
-            # TODO : let's check 404
-            if not TESTER.search(data['number']):
-                return Response({"status": False, "message": "Invalid card number!"})
+            # TESTER = re.compile(
+            #     r"^"
+            #     r"(?!.*(\d)(-?\1){3})"
+            #     r"[456]"
+            #     r"\d{3}"
+            #     r"(?:-?\d{4}){3}"
+            #     r"$"
+            # )
+            # 
+            # # TODO : let's check 404
+            # if not TESTER.search(data['number']):
+            #     return Response({"status": False, "message": "Invalid card number!"})
 
             return transfer_service(wallet, data)
 
