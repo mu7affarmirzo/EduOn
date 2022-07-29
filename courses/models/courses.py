@@ -119,7 +119,7 @@ class LessonsModel(models.Model):
     resolution_480p = models.URLField(blank=True, null=True)
     resolution_720p = models.URLField(blank=True, null=True)
     resolution_1080p = models.URLField(blank=True, null=True)
-    duration = models.DurationField(null=True, default=0)
+    duration = models.DurationField()
 
     def __str__(self):
         return str(f"{self.module.name} - {self.name}")

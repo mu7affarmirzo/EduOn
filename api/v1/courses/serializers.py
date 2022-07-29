@@ -119,14 +119,14 @@ class LessonsIfEnrolledSerializer(serializers.ModelSerializer):
 
 class ModulesListSerializer(serializers.ModelSerializer):
     lessons = LessonsSerializer(many=True)
-    course_dur = serializers.SerializerMethodField('sum')
+    module_duration = serializers.SerializerMethodField('get_duration')
 
     class Meta:
         model = ModuleModel
         fields = '__all__'
 
-    def sum(self, obj):
-        return obj.model_duration
+    def get_duration(self, obj):
+        return obj.module_duration
 
 
 class WatchModulesSerializer(serializers.ModelSerializer):
