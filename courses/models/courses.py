@@ -99,7 +99,10 @@ class ModuleModel(models.Model):
     def module_duration(self):
         sum_duration = datetime.timedelta(0, 0)
         for i in self.lessons.values():
-            sum_duration += i["duration"]
+            if i["duration"] is None:
+                continue
+            else:
+                sum_duration += i["duration"]
         s = int(sum_duration.total_seconds())
         return '{:02}:{:02}:{:02}'.format(s // 3600, s % 3600 // 60, s % 60)
 
