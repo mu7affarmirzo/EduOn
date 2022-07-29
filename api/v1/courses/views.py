@@ -296,7 +296,7 @@ class LessonsListView(APIView):
         return Response(serializer.data)
 
 
-@swagger_auto_schema(tags=['course-modules'], method='post', request_body=LessonsSerializer)
+@swagger_auto_schema(tags=['course-modules'], method='post', request_body=LessonsPostSerializer)
 @permission_classes((IsAuthenticated,))
 @api_view(['POST'])
 def lesson_post_view(request):
@@ -304,7 +304,7 @@ def lesson_post_view(request):
     if not account.is_speaker:
         return Response({"status": False, "message": "User is not speaker!"}, status=status.HTTP_400_BAD_REQUEST)
 
-    serializer = LessonsSerializer(data=request.data)
+    serializer = LessonsPostSerializer(data=request.data)
     if serializer.is_valid():
         try:
             module = ModuleModel.objects.get(id=serializer.validated_data['module'].id)

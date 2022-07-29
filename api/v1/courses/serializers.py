@@ -96,6 +96,13 @@ class CourseSerializer(serializers.ModelSerializer):
         return obj.course_duration
 
 
+class LessonsPostSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LessonsModel
+        fields = '__all__'
+
+
 class LessonsSerializer(serializers.ModelSerializer):
 
     class Meta:
