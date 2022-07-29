@@ -125,8 +125,8 @@ class ModulesListSerializer(serializers.ModelSerializer):
         model = ModuleModel
         fields = '__all__'
 
-    # def get_duration(self, obj):
-    #     return obj.module_duration
+    def get_duration(self, obj):
+        return obj.module_duration
 
 
 class WatchModulesSerializer(serializers.ModelSerializer):
@@ -137,8 +137,8 @@ class WatchModulesSerializer(serializers.ModelSerializer):
         model = ModuleModel
         fields = '__all__'
 
-    # def get_duration(self, obj):
-    #     return obj.module_duration
+    def get_duration(self, obj):
+        return obj.module_duration
 
 
 class ModulesSerializer(serializers.ModelSerializer):
